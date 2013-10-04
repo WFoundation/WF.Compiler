@@ -408,6 +408,12 @@ namespace WF.Compiler
                     // If this is a special character for Lua, than replace it
                     switch (b)
                     {
+                        case 0: // zero as EOF
+                            fileBytes[pos++] = (byte)92;
+                            fileBytes[pos++] = (byte)'0';
+                            fileBytes[pos++] = (byte)'0';
+                            fileBytes[pos++] = (byte)'0';
+                            break;
                         case 7: // BEL
                             fileBytes[pos++] = (byte)92;
                             fileBytes[pos++] = (byte)'a';
