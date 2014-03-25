@@ -1,11 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Engine\EngineGarmin.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Compiler.cs">
     <Files>
       <File FileName="Compiler.cs" Line="1" Column="1" />
       <File FileName="Media.cs" Line="1" Column="1" />
       <File FileName="Cartridge.cs" Line="1" Column="1" />
-      <File FileName="Player.cs" Line="1" Column="1" />
       <File FileName="Engine\IEngine.cs" Line="1" Column="1" />
       <File FileName="Formats\GWC.cs" Line="1" Column="1" />
       <File FileName="Formats\IOutput.cs" Line="1" Column="1" />
@@ -13,7 +12,6 @@
       <File FileName="Formats\GWZ.cs" Line="1" Column="1" />
       <File FileName="Formats\LUA.cs" Line="1" Column="1" />
       <File FileName="Engine\EngineGarmin.cs" Line="110" Column="39" />
-      <File FileName="Parser.cs" Line="1" Column="1" />
       <File FileName="WIGInternalImpl.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
@@ -21,6 +19,7 @@
     <BreakpointStore>
       <Breakpoint file="S:\Entwicklung\CSharp\WF.Compiler\Player\PlayerGarmin.cs" line="97" column="24" />
       <Breakpoint file="S:\Entwicklung\CSharp\WF.Compiler\Engine\EngineGarmin.cs" line="77" column="1" />
+      <Breakpoint file="S:\Entwicklung\CSharp\WF.Compiler\Compiler.cs" line="33" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

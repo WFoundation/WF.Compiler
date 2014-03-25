@@ -27,9 +27,13 @@ namespace WF.Compiler
 {
     public class Compiler
     {
+		public enum DeviceType { Unknown, Garmin, Colorado, Oregon, PocketPC, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iOS, Emulator };
+
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
+			var deviceType = DeviceType.Garmin;
+
 			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\Bebenhausen.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
 
 			if (args.Length == 1)
@@ -78,7 +82,23 @@ namespace WF.Compiler
 			// ---------- Convert cartridge for engine ----------
 
 			// Create selected player
-			IEngine engine = new EngineGarmin();
+			IEngine engine;
+
+			switch(deviceType) {
+			case DeviceType.Colorado:
+			case DeviceType.Garmin:
+			case DeviceType.Oregon:
+				engine = new EngineGarmin();
+				break;
+			case DeviceType.OpenWIG:
+			case DeviceType.WhereYouGo:
+			case DeviceType.DesktopWIG:
+				engine = new EngineOpenWIG();
+				break;
+			default:
+				engine = new EngineGarmin();
+				break;
+			}
 
 			// Convert Lua code and insert special code for this player
 			cartridge = engine.ConvertCartridge(cartridge);

@@ -106,9 +106,17 @@ Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
 			luaCode = luaCode.Replace(":OnGetInput(input)", ":OnGetInput(input)" + Environment.NewLine + "if input == nil then return end");
 
 			// Add special code
-			luaCode = luaCode.Replace("require \"Wherigo\"", _luaCodeExt);
-			luaCode = luaCode.Replace("require (\"Wherigo\")", _luaCodeExt);
-			luaCode = luaCode.Replace("require(\"Wherigo\")", _luaCodeExt);
+			string require = null;
+
+			if (luaCode.Contains("require \"Wherigo\""))
+				require = "require \"Wherigo\"";
+			if (luaCode.Contains("require (\"Wherigo\")"))
+				require = "require (\"Wherigo\")";
+			if (luaCode.Contains("require(\"Wherigo\")"))
+				require = "require(\"Wherigo\")";
+
+			if (require != null)
+				luaCode = luaCode.Replace(require, _luaCodeExt);
 
 			return luaCode;
 		}

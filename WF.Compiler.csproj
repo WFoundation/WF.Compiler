@@ -58,6 +58,7 @@
     <Compile Include="Formats\LUA.cs" />
     <Compile Include="Engine\IEngine.cs" />
     <Compile Include="Engine\EngineGarmin.cs" />
+    <Compile Include="Engine\EngineOpenWIG.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
