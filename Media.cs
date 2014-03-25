@@ -1,6 +1,6 @@
 ///
 /// WF.Compiler - A Wherigo Compiler.
-/// Copyright (C) 2012-2013  Dirk Weltz <web@weltz-online.de>
+/// Copyright (C) 2012-2014  Dirk Weltz <web@weltz-online.de>
 ///
 /// This program is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Lesser General Public License as
@@ -21,23 +21,29 @@ using System.IO;
 using Ionic.Zip;
 using System.Collections.Generic;
 
-
 namespace WF.Compiler
 {
+	public enum MediaFormat { bmp=1, png=2, jpg=3, gif=4, wav=17, mp3=18, fdl=19 };
 
-	public enum MediaFormat { bmp=1, png=2, jpg=3, gif=4, wav=17, mp3=18, fdl=19 }
+	public static class MediaHelpers
+	{
+		public static bool IsImage(this MediaFormat mf)
+		{
+			return (mf == MediaFormat.bmp || mf == MediaFormat.png || mf == MediaFormat.jpg || mf == MediaFormat.gif);
+		}
+
+		public static bool IsSound(this MediaFormat mf)
+		{
+			return (mf == MediaFormat.wav || mf == MediaFormat.mp3 || mf == MediaFormat.fdl);
+		}
+	}
 
 	public class MediaResource
 	{
 		public MediaFormat Type;
 		public string Filename;
-		public DeviceType Device = DeviceType.Unknown; 
 		public List<String> Directives = new List<String> ();
-
-        public int GetMediaFormatAsLong()
-        {
-            return (int) Type;
-        }
+		public byte[] Data;
 	}
 
 	public class Media
@@ -47,33 +53,8 @@ namespace WF.Compiler
 		public string Description;
 		public string AltText;
 		public string Id;
-		public int Entry = -1;  // No valid entry in the list of resources, which we can use
+		public MediaResource Resource;
 		public List<MediaResource> Resources = new List<MediaResource> ();
-
-        public int MediaType { get { return Entry > -1 ? (int)Resources[Entry].Type : 0; } }
-
-        /// <summary>
-        /// Extract the file which belongs to the entry as byte array.
-        /// </summary>
-        /// <param name="zip">ZipFile where to extract the data from.</param>
-        /// <returns>Byte array with the data for the image entry. If entry is -1, than it returns null.</returns>
-        public byte[] GetMediaAsByteArray(ZipFile zip)
-        {
-            byte[] result = null;
-            string filename = Entry > -1 ? Resources[Entry].Filename : null;
-
-            if ( filename != null )
-            {
-                BinaryReader br = new BinaryReader(zip[filename].OpenReader());
-                result = new byte[(int.MaxValue < zip[filename].UncompressedSize ? int.MaxValue : (int)zip[filename].UncompressedSize)];
-                br.Read(result, 0, (int.MaxValue < result.Length ? int.MaxValue : (int)result.Length));
-                br.Close();
-            }
-
-            return result;
-        }
-        
     }
-
 }
 

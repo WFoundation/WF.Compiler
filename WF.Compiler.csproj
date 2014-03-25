@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{87F5A1DE-F8F7-4BAE-B643-65C58449574F}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -35,21 +35,41 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Reference Include="SharpLua">
-      <HintPath>.\SharpLua.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
     <Reference Include="Ionic.Zip">
-      <HintPath>.\Ionic.Zip.dll</HintPath>
+      <HintPath>Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="Eluant">
+      <HintPath>Eluant.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="Parser.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="Media.cs" />
     <Compile Include="Cartridge.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="WIGInternalImpl.cs" />
+    <Compile Include="Formats\GWC.cs" />
+    <Compile Include="Formats\IOutput.cs" />
+    <Compile Include="Formats\IInput.cs" />
+    <Compile Include="Formats\GWZ.cs" />
+    <Compile Include="Formats\LUA.cs" />
+    <Compile Include="Engine\IEngine.cs" />
+    <Compile Include="Engine\EngineGarmin.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="Formats\" />
+    <Folder Include="Engine\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Wherigo.luac" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lua5.1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

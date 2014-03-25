@@ -1,17 +1,6 @@
-//
-//  WF Compiler
-//  Copyright (C) 2012-2013  Dirk Weltz <web@weltz-online.de>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ///
 /// WF.Compiler - A Wherigo Compiler.
-/// Copyright (C) 2012-2013  Dirk Weltz <web@weltz-online.de>
+/// Copyright (C) 2012-2014  Dirk Weltz <web@weltz-online.de>
 ///
 /// This program is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Lesser General Public License as
@@ -60,10 +49,13 @@ namespace WF.Compiler
 		public string CountryId;
 		public bool Complete;
 		public bool UseLogging;
-		public string Splash;
-		public string Icon;
+		public int Poster = -1;
+		public int Icon = -1;
+		public string LuaCode;
+		public string LuaFileName;
+		public byte[] Chunk;
 
-		public List<Media> MediaList = new List<Media> ();
+		public List<Media> Medias = new List<Media> ();
 
 		public Cartridge ()
 		{
