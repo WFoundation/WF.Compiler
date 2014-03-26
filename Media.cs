@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace WF.Compiler
 {
-	public enum MediaFormat { bmp=1, png=2, jpg=3, gif=4, wav=17, mp3=18, fdl=19 };
+	public enum MediaFormat { bmp=1, png=2, jpg=3, gif=4, wav=17, mp3=18, fdl=19, ogg=21 };
 
 	public static class MediaHelpers
 	{
@@ -34,7 +34,7 @@ namespace WF.Compiler
 
 		public static bool IsSound(this MediaFormat mf)
 		{
-			return (mf == MediaFormat.wav || mf == MediaFormat.mp3 || mf == MediaFormat.fdl);
+			return (mf == MediaFormat.wav || mf == MediaFormat.mp3 || mf == MediaFormat.fdl || mf == MediaFormat.ogg);
 		}
 	}
 

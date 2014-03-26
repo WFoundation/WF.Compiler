@@ -2,17 +2,21 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Compiler.cs">
     <Files>
-      <File FileName="Compiler.cs" Line="111" Column="4" />
-      <File FileName="Media.cs" Line="1" Column="1" />
+      <File FileName="Compiler.cs" Line="254" Column="21" />
+      <File FileName="Media.cs" Line="37" Column="93" />
       <File FileName="Cartridge.cs" Line="1" Column="1" />
       <File FileName="Engine\IEngine.cs" Line="1" Column="1" />
       <File FileName="Formats\GWC.cs" Line="1" Column="1" />
       <File FileName="Formats\IOutput.cs" Line="1" Column="1" />
       <File FileName="Formats\IInput.cs" Line="1" Column="1" />
       <File FileName="Formats\GWZ.cs" Line="1" Column="1" />
-      <File FileName="Formats\LUA.cs" Line="1" Column="1" />
-      <File FileName="Engine\EngineGarmin.cs" Line="121" Column="1" />
-      <File FileName="Engine\EngineOpenWIG.cs" Line="169" Column="69" />
+      <File FileName="Formats\LUA.cs" Line="337" Column="24" />
+      <File FileName="Engine\EngineGarmin.cs" Line="92" Column="17" />
+      <File FileName="Engine\EngineOpenWIG.cs" Line="1" Column="1" />
+      <File FileName="Engine\EnginePocketPC.cs" Line="1" Column="1" />
+      <File FileName="Engine\EngineXMarksTheSpot.cs" Line="1" Column="1" />
+      <File FileName="Engine\EngineiOS.cs" Line="1" Column="1" />
+      <File FileName="Engine\EngineDefault.cs" Line="122" Column="106" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

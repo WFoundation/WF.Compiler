@@ -25,10 +25,10 @@ using System.Collections.Generic;
 
 namespace WF.Compiler
 {
+	public enum DeviceType { Unknown, Garmin, Colorado, Oregon, PocketPC, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iOS, Emulator };
+
 	public static class Compiler
     {
-		public enum DeviceType { Unknown, Garmin, Colorado, Oregon, PocketPC, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iOS, Emulator };
-
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
@@ -81,34 +81,8 @@ namespace WF.Compiler
 
 			// ---------- Convert cartridge for engine ----------
 
-			// Create selected player
-			IEngine engine;
-
-			switch(device) {
-			case DeviceType.Colorado:
-			case DeviceType.Garmin:
-			case DeviceType.Oregon:
-				engine = new EngineGarmin();
-				break;
-			case DeviceType.PocketPC:
-				engine = new EnginePocketPC();
-				break;
-			case DeviceType.iOS:
-				engine = new EngineiOS();
-				break;
-			case DeviceType.OpenWIG:
-			case DeviceType.WhereYouGo:
-			case DeviceType.DesktopWIG:
-				engine = new EngineOpenWIG();
-				break;
-			case DeviceType.XMarksTheSpot:
-				engine = new EngineXMarksTheSpot();
-				break;
-			case DeviceType.Emulator:
-			default:
-				engine = new EngineEmulator();
-				break;
-			}
+			// Create selected engine
+			IEngine engine = CreateEngine(device);
 
 			// Convert Lua code and insert special code for this player
 			cartridge = engine.ConvertCartridge(cartridge);
@@ -204,33 +178,7 @@ namespace WF.Compiler
 			// ---------- Convert cartridge for engine ----------
 
 			// Create selected player
-			IEngine engine;
-
-			switch(device) {
-			case DeviceType.Colorado:
-			case DeviceType.Garmin:
-			case DeviceType.Oregon:
-				engine = new EngineGarmin();
-				break;
-			case DeviceType.PocketPC:
-				engine = new EnginePocketPC();
-				break;
-			case DeviceType.iOS:
-				engine = new EngineiOS();
-				break;
-			case DeviceType.OpenWIG:
-			case DeviceType.WhereYouGo:
-			case DeviceType.DesktopWIG:
-				engine = new EngineOpenWIG();
-				break;
-			case DeviceType.XMarksTheSpot:
-				engine = new EngineXMarksTheSpot();
-				break;
-			case DeviceType.Emulator:
-			default:
-				engine = new EngineEmulator();
-				break;
-			}
+			IEngine engine = CreateEngine(device);
 
 			// Convert Lua code and insert special code for this player
 			cartridge = engine.ConvertCartridge(cartridge);
@@ -261,6 +209,54 @@ namespace WF.Compiler
 				return null;
 			}
 
+		}
+
+		static IEngine CreateEngine (DeviceType device)
+		{
+			IEngine result;
+
+			switch (device) {
+			case DeviceType.Colorado:
+			case DeviceType.Garmin:
+			case DeviceType.Oregon:
+				result = new EngineGarmin ();
+				break;
+			case DeviceType.PocketPC:
+				result = new EngineDefault (DeviceType.PocketPC, new List<MediaFormat> () {
+					MediaFormat.png,
+					MediaFormat.bmp,
+					MediaFormat.jpg,
+					MediaFormat.gif,
+					MediaFormat.wav,
+					MediaFormat.mp3,
+					MediaFormat.ogg
+				});
+				break;
+			case DeviceType.iOS:
+				result = new EngineiOS ();
+				break;
+			case DeviceType.OpenWIG:
+			case DeviceType.WhereYouGo:
+			case DeviceType.DesktopWIG:
+				result = new EngineOpenWIG ();
+				break;
+			case DeviceType.XMarksTheSpot:
+				result = new EngineXMarksTheSpot ();
+				break;
+			case DeviceType.Emulator:
+			default:
+				result = new EngineDefault (DeviceType.PocketPC, new List<MediaFormat> () {
+					MediaFormat.png,
+					MediaFormat.bmp,
+					MediaFormat.jpg,
+					MediaFormat.gif,
+					MediaFormat.wav,
+					MediaFormat.mp3
+				});
+				break;
+			}
+
+			return result;
 		}
     }
 }

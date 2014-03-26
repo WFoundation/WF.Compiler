@@ -59,10 +59,10 @@
     <Compile Include="Engine\IEngine.cs" />
     <Compile Include="Engine\EngineGarmin.cs" />
     <Compile Include="Engine\EngineOpenWIG.cs" />
-    <Compile Include="Engine\EngineEmulator.cs" />
     <Compile Include="Engine\EnginePocketPC.cs" />
     <Compile Include="Engine\EngineXMarksTheSpot.cs" />
     <Compile Include="Engine\EngineiOS.cs" />
+    <Compile Include="Engine\EngineDefault.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

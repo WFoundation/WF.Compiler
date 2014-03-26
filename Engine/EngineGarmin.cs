@@ -108,7 +108,7 @@ Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
 		string ConvertCode(string luaCode, string variable)
 		{
 			// Workaround for problems with not handled breaks of inputs
-			luaCode = luaCode.Replace(":OnGetInput(input)", ":OnGetInput(input)" + Environment.NewLine + "if input == nil then return end");
+			luaCode = Regex.Replace(luaCode, @":OnGetInput\(input\)", ":OnGetInput(input)" + Environment.NewLine + "if input == nil then return end");
 
 			luaCode = Regex.Replace(luaCode, @"require\s*\(?[""']Wherigo[""']\)?", "require \"Wherigo\"" + Environment.NewLine + _luaCodeExtBegin);
 			luaCode = Regex.Replace(luaCode, @"return\s*" + variable, _luaCodeExtEnd + Environment.NewLine + "return " + variable);
