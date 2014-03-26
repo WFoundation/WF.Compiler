@@ -25,14 +25,14 @@ using System.Collections.Generic;
 
 namespace WF.Compiler
 {
-    public class Compiler
+	public static class Compiler
     {
 		public enum DeviceType { Unknown, Garmin, Colorado, Oregon, PocketPC, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iOS, Emulator };
 
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
-			var deviceType = DeviceType.Garmin;
+			var device = DeviceType.Garmin;
 
 			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\Bebenhausen.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
 
@@ -84,19 +84,29 @@ namespace WF.Compiler
 			// Create selected player
 			IEngine engine;
 
-			switch(deviceType) {
+			switch(device) {
 			case DeviceType.Colorado:
 			case DeviceType.Garmin:
 			case DeviceType.Oregon:
 				engine = new EngineGarmin();
+				break;
+			case DeviceType.PocketPC:
+				engine = new EnginePocketPC();
+				break;
+			case DeviceType.iOS:
+				engine = new EngineiOS();
 				break;
 			case DeviceType.OpenWIG:
 			case DeviceType.WhereYouGo:
 			case DeviceType.DesktopWIG:
 				engine = new EngineOpenWIG();
 				break;
+			case DeviceType.XMarksTheSpot:
+				engine = new EngineXMarksTheSpot();
+				break;
+			case DeviceType.Emulator:
 			default:
-				engine = new EngineGarmin();
+				engine = new EngineEmulator();
 				break;
 			}
 
@@ -137,6 +147,121 @@ namespace WF.Compiler
 
 			Console.WriteLine("Time: {0}", DateTime.Now - start);
         }
+
+		/// <summary>
+		/// Checke the file with name fileInput, if it is a valid GWZ file and the Lua code has no errors.
+		/// </summary>
+		/// <param name="fileInput">File name for input.</param>
+		public static void Upload(string fileInput)
+		{
+			Upload(new FileStream(fileInput, FileMode.Open));
+		}
+
+		/// <summary>
+		/// Checke the stream fileInput, if it is a valid GWZ file and the Lua code has no errors.
+		/// </summary>
+		/// <param name="fileInput">Stream for input.</param>
+		public static void Upload(Stream ifs)
+		{
+			// ---------- Create GWZ file only (required for upload and download of GWZ file) ----------
+
+			// Create object für reading input file (could be also any other format implementing IInput)
+			var inputFormat = new GWZ(ifs);
+
+			// ---------- Check GWZ file (only required for upload of GWZ file) ----------
+
+			// Check gwz file for errors (Lua code and all files included)
+			// Could throw CompilerLuaException when there is a bug in Lua code
+			inputFormat.Check();
+
+			// We are ready an no exception was thrown, so we only have to close the input stream and leave.
+			ifs.Close();
+		}
+
+		public static MemoryStream Download(string fileInput, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
+		{
+			return Download(new FileStream(fileInput, FileMode.Open), device, userName, completitionCode);
+		}
+
+		public static MemoryStream Download(Stream ifs, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
+		{
+			// ---------- Create GWZ file only (required for upload and download of GWZ file) ----------
+
+			// Create object für reading input file (could be also any other format implementing IInput)
+			var inputFormat = new GWZ(ifs);
+
+			// ---------- Check GWZ file (only required for upload of GWZ file) ----------
+
+			// Check gwz file for errors (Lua code and all files included)
+			// Now there shouldn't be any errors, because files on the server are checked.
+			inputFormat.Check();
+
+			// ---------- Load cartridge from GWZ file (required when downloading cartridge) ----------
+
+			// Load Lua code and extract all required data
+			Cartridge cartridge = inputFormat.Load();
+
+			// ---------- Convert cartridge for engine ----------
+
+			// Create selected player
+			IEngine engine;
+
+			switch(device) {
+			case DeviceType.Colorado:
+			case DeviceType.Garmin:
+			case DeviceType.Oregon:
+				engine = new EngineGarmin();
+				break;
+			case DeviceType.PocketPC:
+				engine = new EnginePocketPC();
+				break;
+			case DeviceType.iOS:
+				engine = new EngineiOS();
+				break;
+			case DeviceType.OpenWIG:
+			case DeviceType.WhereYouGo:
+			case DeviceType.DesktopWIG:
+				engine = new EngineOpenWIG();
+				break;
+			case DeviceType.XMarksTheSpot:
+				engine = new EngineXMarksTheSpot();
+				break;
+			case DeviceType.Emulator:
+			default:
+				engine = new EngineEmulator();
+				break;
+			}
+
+			// Convert Lua code and insert special code for this player
+			cartridge = engine.ConvertCartridge(cartridge);
+			userName = engine.ConvertString(userName);
+
+			// Now we can close the input, because we don't require it anymore
+			ifs.Close();
+
+			// ---------- Compile Lua code into binary chunk ----------
+
+			// Compile Lua code
+			cartridge.Chunk = LUA.Compile(cartridge.LuaCode, cartridge.LuaFileName);
+
+			// ---------- Save cartridge as GWC file ----------
+
+			// Create object for output format (could be also WFC or any other IOutput)
+			var outputFormat = new GWC();
+
+			// Write output file
+			try {
+				// Create output in correct format
+				var ms = outputFormat.Create(cartridge, userName, 0, completitionCode);
+				return ms;
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+				return null;
+			}
+
+		}
     }
 }
 

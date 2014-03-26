@@ -332,7 +332,7 @@ namespace WF.Compiler
 			get { return _line; }
 		}
 
-		public string Message
+		public override string Message
 		{
 			get { return _message; }
 		}

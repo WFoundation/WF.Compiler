@@ -31,10 +31,15 @@ namespace WF.Compiler
 	{
 		readonly Encoding _encodingWin1252 = Encoding.GetEncoding(1252);
 
-		readonly string _luaCodeExt = @"require ""Wherigo""
-
+		readonly string _luaCodeExtBegin = @"
 WFCompShowScreen = Wherigo.ShowScreen
 Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end" + Environment.NewLine;
+
+		readonly string _luaCodeExtEnd = @"
+-- This is the end" + Environment.NewLine;
+
+		readonly string _luaCodeExtOnStart = @"
+-- This is the OnStart" + Environment.NewLine;
 
 		List<MediaFormat> _mediaFormats = new List<MediaFormat>() { MediaFormat.bmp, MediaFormat.png, MediaFormat.jpg, MediaFormat.gif, MediaFormat.fdl };
 
@@ -72,7 +77,7 @@ Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
 				luaCode = ReplaceSpecialCharacters(luaCode);
 			}
 
-			cartridge.LuaCode = ConvertCode(luaCode);
+			cartridge.LuaCode = ConvertCode(luaCode, cartridge.Variable);
 
 			return cartridge;
 		}
@@ -100,23 +105,14 @@ Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
 		/// </remarks>
 		/// <returns>String of Lua code in garmin dependent format.</returns>
 		/// <param name="code">Lua code.</param>
-		string ConvertCode(string luaCode)
+		string ConvertCode(string luaCode, string variable)
 		{
 			// Workaround for problems with not handled breaks of inputs
 			luaCode = luaCode.Replace(":OnGetInput(input)", ":OnGetInput(input)" + Environment.NewLine + "if input == nil then return end");
 
-			// Add special code
-			string require = null;
-
-			if (luaCode.Contains("require \"Wherigo\""))
-				require = "require \"Wherigo\"";
-			if (luaCode.Contains("require (\"Wherigo\")"))
-				require = "require (\"Wherigo\")";
-			if (luaCode.Contains("require(\"Wherigo\")"))
-				require = "require(\"Wherigo\")";
-
-			if (require != null)
-				luaCode = luaCode.Replace(require, _luaCodeExt);
+			luaCode = Regex.Replace(luaCode, @"require\s*\(?[""']Wherigo[""']\)?", "require \"Wherigo\"" + Environment.NewLine + _luaCodeExtBegin);
+			luaCode = Regex.Replace(luaCode, @"return\s*" + variable, _luaCodeExtEnd + Environment.NewLine + "return " + variable);
+			luaCode = Regex.Replace(luaCode, variable + @":OnStart\(\)", variable + ":OnStart()" + Environment.NewLine + _luaCodeExtOnStart);
 
 			return luaCode;
 		}
