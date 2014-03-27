@@ -32,9 +32,12 @@ namespace WF.Compiler
 		DeviceType _device = DeviceType.Emulator;
 		List<MediaFormat> _mediaFormats = new List<MediaFormat>();
 
-		readonly string _luaCodeExtBegin = @"";
-		readonly string _luaCodeExtEnd = @"";
-		readonly string _luaCodeExtOnStart = @"";
+		readonly string _luaCodeExtBegin = @"-- Before code";
+		readonly string _luaCodeExtEnd = @"-- After code";
+		readonly string _luaCodeExtOnStartBefore = @"-- Before OnStart";
+		readonly string _luaCodeExtOnStartAfter = @"-- After OnStart";
+		readonly string _luaCodeExtOnRestoreBefore = @"-- Before OnRestore";
+		readonly string _luaCodeExtOnRestoreAfter = @"-- After OnRestore";
 
 		public EngineDefault (DeviceType device, List<MediaFormat> mediaFormats)
 		{
@@ -88,11 +91,31 @@ namespace WF.Compiler
 			luaCode = Regex.Replace(luaCode, @":OnGetInput\(input\)", ":OnGetInput(input)" + Environment.NewLine + "if input == nil then return end");
 
 			if (!String.IsNullOrEmpty(_luaCodeExtBegin))
-				luaCode = Regex.Replace(luaCode, @"require\s*\(?[""']Wherigo[""']\)?", "require \"Wherigo\"" + Environment.NewLine + _luaCodeExtBegin);
+				luaCode = @"require ""Wherigo""" + Environment.NewLine + _luaCodeExtBegin.Replace("cartridge", variable) + Environment.NewLine + luaCode;
+			if (!String.IsNullOrEmpty(_luaCodeExtOnStartBefore) || !String.IsNullOrEmpty(_luaCodeExtOnStartAfter)) {
+				string replace = @"WFCompilerCartridgeOnStart = " + variable + @".OnStart" + Environment.NewLine;
+				replace += variable + @".OnStart = function (self)" + Environment.NewLine;
+				if (!String.IsNullOrEmpty(_luaCodeExtOnStartBefore))
+					replace += _luaCodeExtOnStartBefore.Replace("cartridge", variable) + Environment.NewLine;
+				replace += @"if type(WFCompilerCartridgeOnStart) == ""function"" then WFCompilerCartridgeOnStart(self) end" + Environment.NewLine;
+				if (!String.IsNullOrEmpty(_luaCodeExtOnStartAfter))
+					replace += _luaCodeExtOnStartAfter.Replace("cartridge", variable) + Environment.NewLine;
+				replace += "end" + Environment.NewLine;
+				luaCode = Regex.Replace(luaCode, @"return\s*" + variable,replace + Environment.NewLine + "return " + variable);
+			}
+			if (!String.IsNullOrEmpty(_luaCodeExtOnRestoreBefore) || !String.IsNullOrEmpty(_luaCodeExtOnRestoreAfter)) {
+				string replace = @"WFCompilerCartridgeOnRestore = " + variable + @".OnRestore" + Environment.NewLine;
+				replace += variable + @".OnRestore = function (self)" + Environment.NewLine;
+				if (!String.IsNullOrEmpty(_luaCodeExtOnRestoreBefore))
+					replace += _luaCodeExtOnRestoreBefore.Replace("cartridge", variable) + Environment.NewLine;
+				replace += @"if type(WFCompilerCartridgeOnRestore) == ""function"" then WFCompilerCartridgeOnRestore(self) end" + Environment.NewLine;
+				if (!String.IsNullOrEmpty(_luaCodeExtOnRestoreAfter))
+					replace += _luaCodeExtOnRestoreAfter.Replace("cartridge", variable) + Environment.NewLine;
+				replace += "end" + Environment.NewLine;
+				luaCode = Regex.Replace(luaCode, @"return\s*" + variable, replace + Environment.NewLine + "return " + variable);
+			}
 			if (!String.IsNullOrEmpty(_luaCodeExtEnd))
-				luaCode = Regex.Replace(luaCode, @"return\s*" + variable, _luaCodeExtEnd + Environment.NewLine + "return " + variable);
-			if (!String.IsNullOrEmpty(_luaCodeExtOnStart))
-				luaCode = Regex.Replace(luaCode, variable + @":OnStart\(\)", variable + ":OnStart()" + Environment.NewLine + _luaCodeExtOnStart);
+				luaCode = Regex.Replace(luaCode, @"return\s*" + variable, _luaCodeExtEnd.Replace("cartridge", variable) + Environment.NewLine + "return " + variable);
 
 			return luaCode;
 		}

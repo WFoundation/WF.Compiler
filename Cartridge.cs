@@ -55,6 +55,12 @@ namespace WF.Compiler
 		public string LuaFileName;
 		public byte[] Chunk;
 
+		public List<string> Zones = new List<string>();
+		public List<string> Items = new List<string>();
+		public List<string> Characters = new List<string>();
+		public List<string> Inputs = new List<string>();
+		public List<string> Timers = new List<string>();
+
 		public List<Media> Medias = new List<Media> ();
 
 		public Cartridge ()

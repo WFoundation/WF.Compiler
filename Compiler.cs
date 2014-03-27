@@ -32,7 +32,7 @@ namespace WF.Compiler
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
-			var device = DeviceType.Garmin;
+			var device = DeviceType.Emulator; //.Garmin;
 
 			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\Bebenhausen.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
 

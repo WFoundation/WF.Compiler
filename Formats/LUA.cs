@@ -177,6 +177,29 @@ namespace WF.Compiler
 				}
 			}
 
+			// Get all variable names
+			foreach(KeyValuePair<LuaValue, LuaValue> pair in luaState.Globals) {
+				var k = pair.Key;
+				var v = pair.Value;
+				if (v is LuaTable) {
+					var className = ((LuaTable)v)["ClassName"];
+					if (className != null && className.ToString().Equals("Zone"))
+						result.Zones.Add(k.ToString());
+					if (className != null && className.ToString().Equals("ZItem"))
+						result.Items.Add(k.ToString());
+					if (className != null && className.ToString().Equals("ZCharacter")) {
+						if (!k.ToString().Equals("Player")) 
+							result.Characters.Add(k.ToString());
+					}
+					if (className != null && className.ToString().Equals("ZTimer"))
+						result.Timers.Add(k.ToString());
+					if (className != null && className.ToString().Equals("ZInput"))
+						result.Inputs.Add(k.ToString());
+					if (className != null && className.ToString().Equals("ZCartridge"))
+						result.Variable = k.ToString();
+				}
+			}
+
 			return result;
 		}
 
