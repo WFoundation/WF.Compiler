@@ -1,17 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Formats\LUA.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Engine\EngineGarmin.cs">
     <Files>
-      <File FileName="Compiler.cs" Line="1" Column="1" />
+      <File FileName="Compiler.cs" Line="98" Column="4" />
       <File FileName="Media.cs" Line="1" Column="1" />
       <File FileName="Cartridge.cs" Line="1" Column="1" />
-      <File FileName="Formats\LUA.cs" Line="191" Column="12" />
+      <File FileName="Formats\LUA.cs" Line="1" Column="1" />
       <File FileName="Engine\IEngine.cs" Line="1" Column="1" />
       <File FileName="Formats\GWC.cs" Line="1" Column="1" />
       <File FileName="Formats\IOutput.cs" Line="1" Column="1" />
       <File FileName="Formats\IInput.cs" Line="1" Column="1" />
       <File FileName="Formats\GWZ.cs" Line="1" Column="1" />
-      <File FileName="Engine\EngineGarmin.cs" Line="1" Column="1" />
+      <File FileName="Engine\EngineGarmin.cs" Line="42" Column="37" />
       <File FileName="Engine\EngineOpenWIG.cs" Line="1" Column="1" />
       <File FileName="Engine\EnginePocketPC.cs" Line="1" Column="1" />
       <File FileName="Engine\EngineXMarksTheSpot.cs" Line="1" Column="1" />
@@ -23,7 +23,6 @@
     <BreakpointStore>
       <Breakpoint file="S:\Entwicklung\CSharp\WF.Compiler\Player\PlayerGarmin.cs" line="97" column="24" />
       <Breakpoint file="S:\Entwicklung\CSharp\WF.Compiler\Engine\EngineDefault.cs" line="120" column="1" />
-      <Breakpoint file="S:\Entwicklung\CSharp\WF.Compiler\Formats\LUA.cs" line="203" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

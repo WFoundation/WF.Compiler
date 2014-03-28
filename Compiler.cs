@@ -32,9 +32,9 @@ namespace WF.Compiler
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
-			var device = DeviceType.Emulator; //.Garmin;
+			var device = DeviceType.Garmin; //.Garmin;
 
-			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\Bebenhausen.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
+			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\WherigoTestsuite.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
 
 			if (args.Length == 1)
 				fileInput = args[0];

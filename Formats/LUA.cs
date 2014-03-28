@@ -170,6 +170,7 @@ namespace WF.Compiler
 				LuaTable obj = ((LuaTable)pair.Value);
 				// Get type of ZObject
 				string className = (LuaString)obj["ClassName"];
+				string name = (LuaString)obj["Name"];
 				// Check type of ZObject
 				if (className.Equals("ZMedia")) {
 					Media media = ExtractMedia (obj);
@@ -294,6 +295,9 @@ namespace WF.Compiler
 					break;
 				case "fdl":
 					mediaResource.Type = MediaFormat.fdl;
+					break;
+				case "ogg":
+					mediaResource.Type = MediaFormat.ogg;
 					break;
 				}
 				// Get directives for this media resource entry

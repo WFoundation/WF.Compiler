@@ -31,17 +31,28 @@ namespace WF.Compiler
 	{
 		readonly Encoding _encodingWin1252 = Encoding.GetEncoding(1252);
 
-		readonly string _luaCodeExtBegin = @"
--- Beginning of insertion by WF.Compiler
-WFCompShowScreen = Wherigo.ShowScreen
-Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
--- End of insertion by WF.Compiler" + Environment.NewLine;
-
-		readonly string _luaCodeExtEnd = @"-- After code";
-		readonly string _luaCodeExtOnStartBefore = @"-- Before OnStart";
-		readonly string _luaCodeExtOnStartAfter = @"-- After OnStart";
-		readonly string _luaCodeExtOnRestoreBefore = @"-- Before OnRestore";
-		readonly string _luaCodeExtOnRestoreAfter = @"-- After OnRestore";
+		readonly string _luaCodeExt = @"require ""Wherigo""
+										-- Replace original code with wrapper function
+										function _main ()
+										  -- copy original lua code here
+										  {0}
+										end
+										-- Insert workaround code before cartridge run
+										-- Standard newline for Garmins
+										Env.NewLine = ""<BR>"" .. string.char(13, 10)
+										-- Remove Garmin crash of ShowScreen
+										WFCompShowScreen = Wherigo.ShowScreen
+										Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen, arg1, arg2) end
+										-- Remove Garmin crash with input returning nil
+										function Wherigo.ZInput.GetInput(self, input)
+  										  local inputString = input or ""<cancelled>""
+  										  Wherigo.LogMessage(""ZInput:GetInput - "" .. self.Name .. "" -> "" .. inputString)
+  										  pcall(Wherigo.doCustomScript, self, ""OnGetInput"", input)
+										end
+										-- Call original Lua code here
+										cartridge = _main ()
+										-- Insert workaround code after cartridge run
+										return cartridge";
 
 		List<MediaFormat> _mediaFormats = new List<MediaFormat>() { MediaFormat.bmp, MediaFormat.png, MediaFormat.jpg, MediaFormat.gif, MediaFormat.fdl };
 
@@ -109,35 +120,8 @@ Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
 		/// <param name="code">Lua code.</param>
 		string ConvertCode(string luaCode, string variable)
 		{
-			// Workaround for problems with not handled breaks of inputs
-			luaCode = Regex.Replace(luaCode, @":OnGetInput\(input\)", ":OnGetInput(input)" + Environment.NewLine + "if input == nil then return end");
-
-			if (!String.IsNullOrEmpty(_luaCodeExtBegin))
-				luaCode = @"require ""Wherigo""" + Environment.NewLine + _luaCodeExtBegin.Replace("cartridge", variable) + Environment.NewLine + luaCode;
-			if (!String.IsNullOrEmpty(_luaCodeExtOnStartBefore) || !String.IsNullOrEmpty(_luaCodeExtOnStartAfter)) {
-				string replace = @"WFCompilerCartridgeOnStart = " + variable + @".OnStart" + Environment.NewLine;
-				replace += variable + @".OnStart = function (self)" + Environment.NewLine;
-				if (!String.IsNullOrEmpty(_luaCodeExtOnStartBefore))
-					replace += _luaCodeExtOnStartBefore.Replace("cartridge", variable) + Environment.NewLine;
-				replace += @"if type(WFCompilerCartridgeOnStart) == ""function"" then WFCompilerCartridgeOnStart(self) end" + Environment.NewLine;
-				if (!String.IsNullOrEmpty(_luaCodeExtOnStartAfter))
-					replace += _luaCodeExtOnStartAfter.Replace("cartridge", variable) + Environment.NewLine;
-				replace += "end" + Environment.NewLine;
-				luaCode = Regex.Replace(luaCode, @"return\s*" + variable,replace + Environment.NewLine + "return " + variable);
-			}
-			if (!String.IsNullOrEmpty(_luaCodeExtOnRestoreBefore) || !String.IsNullOrEmpty(_luaCodeExtOnRestoreAfter)) {
-				string replace = @"WFCompilerCartridgeOnRestore = " + variable + @".OnRestore" + Environment.NewLine;
-				replace += variable + @".OnRestore = function (self)" + Environment.NewLine;
-				if (!String.IsNullOrEmpty(_luaCodeExtOnRestoreBefore))
-					replace += _luaCodeExtOnRestoreBefore.Replace("cartridge", variable) + Environment.NewLine;
-				replace += @"if type(WFCompilerCartridgeOnRestore) == ""function"" then WFCompilerCartridgeOnRestore(self) end" + Environment.NewLine;
-				if (!String.IsNullOrEmpty(_luaCodeExtOnRestoreAfter))
-					replace += _luaCodeExtOnRestoreAfter.Replace("cartridge", variable) + Environment.NewLine;
-				replace += "end" + Environment.NewLine;
-				luaCode = Regex.Replace(luaCode, @"return\s*" + variable, replace + Environment.NewLine + "return " + variable);
-			}
-			if (!String.IsNullOrEmpty(_luaCodeExtEnd))
-				luaCode = Regex.Replace(luaCode, @"return\s*" + variable, _luaCodeExtEnd.Replace("cartridge", variable) + Environment.NewLine + "return " + variable);
+			// Workaround for Garmin problems
+			luaCode = String.Format(_luaCodeExt, luaCode);
 
 			return luaCode;
 		}
@@ -174,6 +158,8 @@ Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
 			foreach(MediaResource mr in media.Resources) {
 				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
 						res = mr;
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr.Type == MediaFormat.fdl || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
+					res = mr;
 			}
 
 			if (res == null)
@@ -187,7 +173,7 @@ Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen(arg1,arg2)) end
 
 			EncoderParameters encParams = new EncoderParameters(2);
 			encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.ColorDepth, 24L);
-			encParams.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 70L);
+			encParams.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
 
 			if (res.Type.IsImage()) {
 				// Image
