@@ -29,6 +29,9 @@ namespace WF.Compiler
 {
 	public class EngineiOS : IEngine
 	{
+		string _mediaSelector;
+		int _maxImageWidth;
+
 		List<MediaType> _mediaFormats = new List<MediaType>() { 
 			MediaType.BMP, 
 			MediaType.PNG, 
@@ -38,8 +41,26 @@ namespace WF.Compiler
 			MediaType.MP3 
 		};
 
-		public EngineiOS ()
+		public EngineiOS (DeviceType device)
 		{
+			switch (device) {
+			case DeviceType.iPhoneRetina:
+				_mediaSelector = "iphoneretina";
+				_maxImageWidth = 640;
+				break;
+			case DeviceType.iPad:
+				_mediaSelector = "ipad";
+				_maxImageWidth = 768;
+				break;
+			case DeviceType.iPadRetina:
+				_mediaSelector = "ipadretina";
+				_maxImageWidth = 1536;
+				break;
+			default:
+				_mediaSelector = "iphone";
+				_maxImageWidth = 320;
+				break;
+			}
 		}
 
 		/// <summary>
@@ -84,33 +105,99 @@ namespace WF.Compiler
 		{
 			MediaResource res = null;
 
+			// Is there a jpeg encoder?
+			// Jpeg image codec
+			ImageCodecInfo jpegCodec = GetEncoderInfo("image/jpeg");
+
+			if (jpegCodec == null)
+				throw new InvalidOperationException("No JPEG encoder found");
+
 			// Are there any resources
 			if (media.Resources.Count < 1)
 				return null;
 
 			// Get the last good media resource that could be found
 			foreach(MediaResource mr in media.Resources) {
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("ios") || mr.Filename.ToLower().Contains("ios")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains(_mediaSelector) || mr.Filename.ToLower().Contains(_mediaSelector)))
 					res = mr;
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Directives.Contains("ios") || mr.Filename.ToLower().Contains("ios")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Directives.Contains(_mediaSelector) || mr.Filename.ToLower().Contains(_mediaSelector)))
 					res = mr;
 			}
 
 			if (res == null)
 				return null;
 
-			// Create MemoryStream
+			// Create MediaResurce
 			MediaResource result = new MediaResource();
 
 			result.Filename = res.Filename;
 			result.Directives = res.Directives;
-			result.Type = res.Type;
-			result.Data = res.Data;
+
+			EncoderParameters encParams = new EncoderParameters(2);
+			encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.ColorDepth, 24L);
+			encParams.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
+
+			if (res.Type.IsImage()) {
+				// Image
+				Image img;
+				using(MemoryStream ims = new MemoryStream(res.Data)) {
+					img = Image.FromStream(ims);
+					// Do special things with the image (resize, bit depth, ...)
+					if (!res.Directives.Contains("noresize") && img.Width > _maxImageWidth)
+						img = ResizeImage(img, _maxImageWidth);
+					// Garmin can only handle jpg
+					using(MemoryStream oms = new MemoryStream()) {
+						img.Save(oms, jpegCodec, encParams);
+						result.Data = oms.ToArray();
+					}
+				}
+				result.Type = MediaType.JPG;
+			}
 
 			// Now remove all resources, because we don't need them anymore
 			media.Resources = null;
 
 			return result;
 		}
+
+		#region Graphics
+
+		// Found at: http://tech.pro/tutorial/620/csharp-tutorial-image-editing-saving-cropping-and-resizing
+
+		private ImageCodecInfo GetEncoderInfo(string mimeType)
+		{
+			// Get image codecs for all image formats
+			ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+
+			// Find the correct image codec
+			for (int i = 0; i < codecs.Length; i++)
+				if (codecs[i].MimeType == mimeType)
+					return codecs[i];
+			return null;
+		}
+
+		private static Image ResizeImage(Image imgToResize, int width)
+		{
+			int sourceWidth = imgToResize.Width;
+			int sourceHeight = imgToResize.Height;
+
+			float nPercent = 0;
+
+			nPercent = ((float)width / (float)sourceWidth);
+
+			int destWidth = (int)(sourceWidth * nPercent);
+			int destHeight = (int)(sourceHeight * nPercent);
+
+			Bitmap b = new Bitmap(destWidth, destHeight, PixelFormat.Format24bppRgb);
+			Graphics g = Graphics.FromImage((Image)b);
+			g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+			g.DrawImage(imgToResize, 0, 0, destWidth, destHeight);
+			g.Dispose();
+
+			return (Image)b;
+		}
+
+		#endregion
 	}
 }

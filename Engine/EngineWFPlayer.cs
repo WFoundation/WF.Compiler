@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 
 namespace WF.Compiler
 {
-	public class EngineOpenWIG : IEngine
+	public class EngineWFPlayer : IEngine
 	{
 		List<MediaType> _mediaFormats = new List<MediaType>() { 
 			MediaType.BMP, 
@@ -35,11 +35,10 @@ namespace WF.Compiler
 			MediaType.JPG, 
 			MediaType.GIF, 
 			MediaType.WAV, 
-			MediaType.MP3,
-			MediaType.OGG
+			MediaType.MP3
 		};
 
-		public EngineOpenWIG ()
+		public EngineWFPlayer ()
 		{
 		}
 
@@ -91,9 +90,9 @@ namespace WF.Compiler
 
 			// Get the last good media resource that could be found
 			foreach(MediaResource mr in media.Resources) {
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("wig") || mr.Filename.ToLower().Contains("wig")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("wfplayer") || mr.Filename.ToLower().Contains("wfplayer")))
 					res = mr;
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Directives.Contains("wig") || mr.Filename.ToLower().Contains("wig")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Directives.Contains("wfplayer") || mr.Filename.ToLower().Contains("wfplayer")))
 					res = mr;
 			}
 

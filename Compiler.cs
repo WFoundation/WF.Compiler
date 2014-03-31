@@ -25,14 +25,14 @@ using System.Collections.Generic;
 
 namespace WF.Compiler
 {
-	public enum DeviceType { Unknown, Garmin, Colorado, Oregon, PocketPC, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iOS, Emulator };
+	public enum DeviceType { Unknown, Garmin, Colorado, Oregon, PocketPC, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iPhone, iPad, iPhoneRetina, iPadRetina, Emulator, WFPlayer };
 
 	public static class Compiler
     {
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
-			var device = DeviceType.Garmin;
+			var device = DeviceType.iPhone; //Garmin;
 
 			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\WherigoTestsuite.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
 
@@ -231,8 +231,14 @@ namespace WF.Compiler
 			case DeviceType.Garmin:
 				result = new EngineGarmin ();
 				break;
-			case DeviceType.iOS:
-				result = new EngineiOS ();
+			case DeviceType.iPhone:
+			case DeviceType.iPad:
+			case DeviceType.iPhoneRetina:
+			case DeviceType.iPadRetina:
+				result = new EngineiOS (device);
+				break;
+			case DeviceType.WFPlayer:
+				result = new EngineWFPlayer();
 				break;
 			case DeviceType.OpenWIG:
 			case DeviceType.WhereYouGo:
