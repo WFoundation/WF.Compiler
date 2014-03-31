@@ -23,24 +23,43 @@ using System.Collections.Generic;
 
 namespace WF.Compiler
 {
-	public enum MediaFormat { bmp=1, png=2, jpg=3, gif=4, wav=17, mp3=18, fdl=19, ogg=21 };
+	public enum MediaType 
+	{
+		Unknown = 0,
+		BMP = 1,
+		PNG = 2,
+		JPG = 3,
+		GIF = 4,
+		WAV = 17,
+		MP3 = 18,
+		FDL = 19,
+		SND = 20,
+		OGG = 21,
+		SWF = 33,
+		TXT = 49
+	}
 
 	public static class MediaHelpers
 	{
-		public static bool IsImage(this MediaFormat mf)
+		public static bool IsImage(this MediaType mf)
 		{
-			return (mf == MediaFormat.bmp || mf == MediaFormat.png || mf == MediaFormat.jpg || mf == MediaFormat.gif);
+			return (mf == MediaType.BMP || mf == MediaType.PNG || mf == MediaType.JPG || mf == MediaType.GIF);
 		}
 
-		public static bool IsSound(this MediaFormat mf)
+		public static bool IsSound(this MediaType mf)
 		{
-			return (mf == MediaFormat.wav || mf == MediaFormat.mp3 || mf == MediaFormat.fdl || mf == MediaFormat.ogg);
+			return (mf == MediaType.WAV || mf == MediaType.MP3 || mf == MediaType.FDL || mf == MediaType.SND || mf == MediaType.OGG);
+		}
+
+		public static bool IsText(this MediaType mf)
+		{
+			return (mf == MediaType.TXT);
 		}
 	}
 
 	public class MediaResource
 	{
-		public MediaFormat Type;
+		public MediaType Type;
 		public string Filename;
 		public List<String> Directives = new List<String> ();
 		public byte[] Data;

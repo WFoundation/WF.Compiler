@@ -29,7 +29,14 @@ namespace WF.Compiler
 {
 	public class EngineiOS : IEngine
 	{
-		List<MediaFormat> _mediaFormats = new List<MediaFormat>() { MediaFormat.bmp, MediaFormat.png, MediaFormat.jpg, MediaFormat.gif, MediaFormat.fdl };
+		List<MediaType> _mediaFormats = new List<MediaType>() { 
+			MediaType.BMP, 
+			MediaType.PNG, 
+			MediaType.JPG, 
+			MediaType.GIF, 
+			MediaType.WAV, 
+			MediaType.MP3 
+		};
 
 		public EngineiOS ()
 		{
@@ -47,6 +54,9 @@ namespace WF.Compiler
 		/// <param name="cartridge">Cartridge object to convert.</param>
 		public Cartridge ConvertCartridge(Cartridge cartridge)
 		{
+			foreach(Media m in cartridge.Medias)
+				m.Resource = ConvertMedia(m);
+				
 			return cartridge;
 		}
 
@@ -59,6 +69,48 @@ namespace WF.Compiler
 		{
 			return text;
 		}
+
+		/// <summary>
+		/// Converts the media in a valid format for this player and returns 
+		/// a valid resource, if there are any.
+		/// </summary>
+		/// <remarks>
+		/// Checks, which resource belongs to this player, change the size 
+		/// or format, if needed, and creates a MediaResource.
+		/// </remarks>
+		/// <returns>MediaResource with the correct media or null.</returns>
+		/// <param name="media">Media.</param>
+		MediaResource ConvertMedia(Media media)
+		{
+			MediaResource res = null;
+
+			// Are there any resources
+			if (media.Resources.Count < 1)
+				return null;
+
+			// Get the last good media resource that could be found
+			foreach(MediaResource mr in media.Resources) {
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("ios") || mr.Filename.ToLower().Contains("ios")))
+					res = mr;
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Directives.Contains("ios") || mr.Filename.ToLower().Contains("ios")))
+					res = mr;
+			}
+
+			if (res == null)
+				return null;
+
+			// Create MemoryStream
+			MediaResource result = new MediaResource();
+
+			result.Filename = res.Filename;
+			result.Directives = res.Directives;
+			result.Type = res.Type;
+			result.Data = res.Data;
+
+			// Now remove all resources, because we don't need them anymore
+			media.Resources = null;
+
+			return result;
+		}
 	}
 }
-

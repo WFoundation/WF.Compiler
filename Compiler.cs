@@ -32,7 +32,7 @@ namespace WF.Compiler
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
-			var device = DeviceType.Garmin; //.Garmin;
+			var device = DeviceType.OpenWIG; //.Garmin;
 
 			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\WherigoTestsuite.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
 
@@ -93,8 +93,14 @@ namespace WF.Compiler
 
 			// ---------- Compile Lua code into binary chunk ----------
 
+			try {
 			// Compile Lua code
 			cartridge.Chunk = LUA.Compile(cartridge.LuaCode, cartridge.LuaFileName);
+			}
+			catch (Exception e)
+			{
+				var t = e.Message;
+			}
 
 			// ---------- Save cartridge as GWC file ----------
 
@@ -159,6 +165,12 @@ namespace WF.Compiler
 
 		public static MemoryStream Download(Stream ifs, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
 		{
+			// ---------- Check device ----------
+
+			// Colorado and Oregon are both the same and called here Garmin
+			if (device == DeviceType.Colorado || device == DeviceType.Oregon)
+				device = DeviceType.Garmin;
+
 			// ---------- Create GWZ file only (required for upload and download of GWZ file) ----------
 
 			// Create object für reading input file (could be also any other format implementing IInput)
@@ -216,21 +228,8 @@ namespace WF.Compiler
 			IEngine result;
 
 			switch (device) {
-			case DeviceType.Colorado:
 			case DeviceType.Garmin:
-			case DeviceType.Oregon:
 				result = new EngineGarmin ();
-				break;
-			case DeviceType.PocketPC:
-				result = new EngineDefault (DeviceType.PocketPC, new List<MediaFormat> () {
-					MediaFormat.png,
-					MediaFormat.bmp,
-					MediaFormat.jpg,
-					MediaFormat.gif,
-					MediaFormat.wav,
-					MediaFormat.mp3,
-					MediaFormat.ogg
-				});
 				break;
 			case DeviceType.iOS:
 				result = new EngineiOS ();
@@ -244,20 +243,14 @@ namespace WF.Compiler
 				result = new EngineXMarksTheSpot ();
 				break;
 			case DeviceType.Emulator:
+			case DeviceType.PocketPC:
 			default:
-				result = new EngineDefault (DeviceType.PocketPC, new List<MediaFormat> () {
-					MediaFormat.png,
-					MediaFormat.bmp,
-					MediaFormat.jpg,
-					MediaFormat.gif,
-					MediaFormat.wav,
-					MediaFormat.mp3
-				});
+				result = new EnginePocketPC ();
 				break;
 			}
 
 			return result;
 		}
-    }
+	}
 }
 

@@ -31,30 +31,30 @@ namespace WF.Compiler
 	{
 		readonly Encoding _encodingWin1252 = Encoding.GetEncoding(1252);
 
-		readonly string _luaCodeExt = @"require ""Wherigo""
-										-- Replace original code with wrapper function
-										function _main ()
-										  -- copy original lua code here
-										  {0}
+		// Put all in the beginning in one line, so that crash report lines are correct
+		// Remove of Garmin crash with cancelled inputs is not possible
+		readonly string _luaCodeExt = @"require ""Wherigo"" function _main () {0}
 										end
 										-- Insert workaround code before cartridge run
 										-- Standard newline for Garmins
-										Env.NewLine = ""<BR>"" .. string.char(13, 10)
+										Env.NewLine = ""<BR>\n""
 										-- Remove Garmin crash of ShowScreen
 										WFCompShowScreen = Wherigo.ShowScreen
 										Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen, arg1, arg2) end
 										-- Remove Garmin crash with input returning nil
-										function Wherigo.ZInput.GetInput(self, input)
-  										  local inputString = input or ""<cancelled>""
-  										  Wherigo.LogMessage(""ZInput:GetInput - "" .. self.Name .. "" -> "" .. inputString)
-  										  pcall(Wherigo.doCustomScript, self, ""OnGetInput"", input)
-										end
 										-- Call original Lua code here
 										cartridge = _main ()
 										-- Insert workaround code after cartridge run
 										return cartridge";
 
-		List<MediaFormat> _mediaFormats = new List<MediaFormat>() { MediaFormat.bmp, MediaFormat.png, MediaFormat.jpg, MediaFormat.gif, MediaFormat.fdl };
+		List<MediaType> _mediaFormats = new List<MediaType>() { 
+			MediaType.BMP, 
+			MediaType.PNG, 
+			MediaType.JPG, 
+			MediaType.GIF, 
+			MediaType.FDL,
+			MediaType.TXT
+		};
 
 		public EngineGarmin ()
 		{
@@ -120,6 +120,10 @@ namespace WF.Compiler
 		/// <param name="code">Lua code.</param>
 		string ConvertCode(string luaCode, string variable)
 		{
+			// Replace all short strings
+			luaCode = ReplaceShortStrings(luaCode);
+			// Replace all long strings
+			luaCode = ReplaceLongStrings(luaCode);
 			// Workaround for Garmin problems
 			luaCode = String.Format(_luaCodeExt, luaCode);
 
@@ -128,18 +132,17 @@ namespace WF.Compiler
 
 		/// <summary>
 		/// Converts the media in a valid format for this player and returns 
-		/// a stream with the data.
+		/// a valid resource, if there are any.
 		/// </summary>
 		/// <remarks>
 		/// Checks, which resource belongs to this player, change the size 
-		/// or format, if needed, and 
-		/// creates a memory stream with the resulting data.
+		/// or format, if needed, and creates a MediaResource.
 		/// </remarks>
-		/// <returns>Stream with The media.</returns>
+		/// <returns>MediaResource with the correct media or null.</returns>
 		/// <param name="media">Media.</param>
 		MediaResource ConvertMedia(Media media)
 		{
-			MediaResource res;
+			MediaResource res = null;
 
 			// Is there a jpeg encoder?
 			// Jpeg image codec
@@ -152,13 +155,11 @@ namespace WF.Compiler
 			if (media.Resources.Count < 1)
 				return null;
 
-			res = media.Resources[0];
-
 			// Get the last good media resource that could be found
 			foreach(MediaResource mr in media.Resources) {
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
-						res = mr;
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr.Type == MediaFormat.fdl || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
+					res = mr;
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Type == MediaType.FDL || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
 					res = mr;
 			}
 
@@ -173,7 +174,7 @@ namespace WF.Compiler
 
 			EncoderParameters encParams = new EncoderParameters(2);
 			encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.ColorDepth, 24L);
-			encParams.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
+			encParams.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
 
 			if (res.Type.IsImage()) {
 				// Image
@@ -189,11 +190,11 @@ namespace WF.Compiler
 						result.Data = oms.ToArray();
 					}
 				}
-				result.Type = MediaFormat.jpg;
+				result.Type = MediaType.JPG;
 			} else {
 				// Sound
-				if (res.Type == MediaFormat.fdl) {
-					result.Type = MediaFormat.fdl;
+				if (res.Type == MediaType.FDL) {
+					result.Type = MediaType.FDL;
 					result.Data = res.Data;
 				} else {
 					result = null;
@@ -205,6 +206,111 @@ namespace WF.Compiler
 
 			return result;
 		}
+
+		#region String Replacement
+
+		string ReplaceShortStrings (string luaCode)
+		{
+			StringBuilder result = new StringBuilder();
+			string[] lines = Regex.Split(luaCode, "\r\n|\n|\r");
+			Regex regex = new Regex(@"(""|')([^\1]*?)\1", RegexOptions.Multiline & RegexOptions.Compiled);
+
+			foreach(string line in lines) {
+				// We start at beginning of the line
+				int startAt = 0;
+				// There could be \" or \' in the string, which stops the regex. 
+				// So we replace \" with "" and \' with ''. Later we reverse this.
+				string searchLine = line.Replace(@"\""",@"/""").Replace(@"\'", @"/'");
+				StringBuilder replaceLine = new StringBuilder(line.Length);
+				Match match = regex.Match(searchLine);
+
+				while(match.Success) {
+					// Append all text up to the beginning "" or '
+					replaceLine.Append(searchLine.Substring(startAt, match.Index - startAt));
+					// Append opening " or '
+					replaceLine.Append(match.Groups[1].Value);
+					// Append text found in "" or ''
+					replaceLine.Append(ReplaceString(match.Groups[2].Value));
+					// Append closing " or '
+					replaceLine.Append(match.Groups[1].Value);
+					// Calc new startAt after the closing " or '
+					startAt = match.Index + match.Length;
+					// Search for the next match
+					match = regex.Match(searchLine, startAt);
+				}
+				// Append the rest of this line
+				replaceLine.Append(searchLine.Substring(startAt));
+				// Append a newline at the end
+				replaceLine.Append(Environment.NewLine);
+				// Reverse any changes to \" and \'
+				replaceLine.Replace(@"/""", @"\""").Replace(@"/'", @"\'");
+				// Add new line to result
+				result.Append(replaceLine);
+			}
+
+			return result.ToString();
+		}
+
+		string ReplaceLongStrings (string luaCode)
+		{
+			StringBuilder result = new StringBuilder();
+			Regex regex = new Regex(@"\[(=*)\[(.*?)\]\1\]", RegexOptions.Singleline); // & RegexOptions.Compiled);
+
+			// We start at beginning of the line
+			int startAt = 0;
+			// There could be \" or \' in the string, which stops the regex. 
+			// So we replace \" with "" and \' with ''. Later we reverse this.
+			Match match = regex.Match(luaCode);
+
+			while(match.Success) {
+				// Append all text up to the beginning [[
+				result.Append(luaCode.Substring(startAt, match.Index - startAt));
+				// Append opening [[
+				result.Append("[");
+				result.Append(match.Groups[1].Value);
+				result.Append("[");
+				// Append text found in "" or ''
+				result.Append(ReplaceString(match.Groups[2].Value));
+				// Append closing ]]
+				result.Append("]");
+				result.Append(match.Groups[1].Value);
+				result.Append("]");
+				// Calc new startAt after the closing " or '
+				startAt = match.Index + match.Length;
+				// Search for the next match
+				match = regex.Match(luaCode, startAt);
+			}
+
+			result.Append(luaCode.Substring(startAt));
+
+			return result.ToString();
+		}
+
+		private string ReplaceString(string text)
+		{
+			string result = text;
+
+			result = result.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\t", "   ");
+			result = Regex.Replace(result, " {2,}", new MatchEvaluator(this.ReplaceSpaces), RegexOptions.Multiline);
+			result = Regex.Replace(result, "\r\n|\n\r", "\n", RegexOptions.Multiline);
+			result = Regex.Replace(result, "\r|\n", "<BR>\n", RegexOptions.Multiline);
+
+			return result;
+		}
+
+		string ReplaceSpaces(Match m)
+		{
+			StringBuilder builder = new StringBuilder(" ");
+
+			for (int i = 1; i < m.Value.Length; i++)
+			{
+				builder.Append("&nbsp;");
+			}
+
+			return builder.ToString();
+		}
+
+		#endregion
 
 		#region Graphics
 
@@ -330,4 +436,3 @@ namespace WF.Compiler
 		#endregion
 	}
 }
-

@@ -276,28 +276,37 @@ namespace WF.Compiler
 					type = Path.GetExtension(mediaResource.Filename);
 				switch(type.ToLower()) {
 				case "bmp":
-					mediaResource.Type = MediaFormat.bmp;
+					mediaResource.Type = MediaType.BMP;
 					break;
 				case "jpg":
-					mediaResource.Type = MediaFormat.jpg;
+					mediaResource.Type = MediaType.JPG;
 					break;
 				case "png":
-					mediaResource.Type = MediaFormat.png;
+					mediaResource.Type = MediaType.PNG;
 					break;
 				case "gif":
-					mediaResource.Type = MediaFormat.gif;
+					mediaResource.Type = MediaType.GIF;
 					break;
 				case "wav":
-					mediaResource.Type = MediaFormat.wav;
+					mediaResource.Type = MediaType.WAV;
 					break;
 				case "mp3":
-					mediaResource.Type = MediaFormat.mp3;
+					mediaResource.Type = MediaType.MP3;
 					break;
 				case "fdl":
-					mediaResource.Type = MediaFormat.fdl;
+					mediaResource.Type = MediaType.FDL;
+					break;
+				case "snd":
+					mediaResource.Type = MediaType.SND;
 					break;
 				case "ogg":
-					mediaResource.Type = MediaFormat.ogg;
+					mediaResource.Type = MediaType.OGG;
+					break;
+				case "swf":
+					mediaResource.Type = MediaType.SWF;
+					break;
+				case "txt":
+					mediaResource.Type = MediaType.TXT;
 					break;
 				}
 				// Get directives for this media resource entry
