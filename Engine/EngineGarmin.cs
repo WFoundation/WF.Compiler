@@ -34,18 +34,40 @@ namespace WF.Compiler
 		// Put all in the beginning in one line, so that crash report lines are correct
 		// Remove of Garmin crash with cancelled inputs is not possible
 		readonly string _luaCodeExt = @"require ""Wherigo"" function _main () {0}
-										end
-										-- Insert workaround code before cartridge run
-										-- Standard newline for Garmins
-										Env.NewLine = ""<BR>\n""
-										-- Remove Garmin crash of ShowScreen
-										WFCompShowScreen = Wherigo.ShowScreen
-										Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen, arg1, arg2) end
-										-- Remove Garmin crash with input returning nil
-										-- Call original Lua code here
-										cartridge = _main ()
-										-- Insert workaround code after cartridge run
-										return cartridge";
+end
+-- Insert workaround code before cartridge run
+-- Standard newline for Garmins
+Env.NewLine = ""<BR>\n""
+-- Remove Garmin crash of ShowScreen
+WFCompShowScreen = Wherigo.ShowScreen
+Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen, arg1, arg2) end
+-- Remove Garmin crash with input returning nil
+function Wherigo.ZInput.GetInput(self, input)
+  local inputString = input or ""<cancelled>""
+  Wherigo.LogMessage(""ZInput:GetInput - "" .. self.Name .. "" -> "" .. inputString)
+  if type(self[""OnGetInput""]) == ""function"" and input ~= nil then
+    pcall(self[""OnGetInput""], self, input)
+  end
+end
+-- Remove Garmin bug with timer stop in OnTick
+function Wherigo.ZTimer.Tick(self)
+  if self.Running then
+    self.Stopped = false
+    if self.Type ~= ""Interval"" then
+      self.Running = false
+    end
+    if type(self[""OnTick""]) == ""function"" then
+      self[""OnTick""](self)
+    end
+    if self.Type == ""Interval"" and self.Running == true then
+      self:begin()
+    end
+  end
+end
+-- Call original Lua code here
+cartridge = _main ()
+-- Insert workaround code after cartridge run
+return cartridge";
 
 		List<MediaType> _mediaFormats = new List<MediaType>() { 
 			MediaType.BMP, 

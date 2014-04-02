@@ -148,10 +148,15 @@ namespace WF.Compiler
 					// Garmin can only handle jpg
 					using(MemoryStream oms = new MemoryStream()) {
 						img.Save(oms, jpegCodec, encParams);
+						result.Type = MediaType.JPG;
 						result.Data = oms.ToArray();
 					}
 				}
 				result.Type = MediaType.JPG;
+			}
+			if (res.Type.IsSound()) {
+				result.Type = res.Type;
+				result.Data = res.Data;
 			}
 
 			// Now remove all resources, because we don't need them anymore
