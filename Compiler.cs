@@ -100,6 +100,12 @@ namespace WF.Compiler
 				return;
 			}
 
+			if (!File.Exists(fileInput)) {
+				Usage();
+				return;
+			}
+
+
 			if (fileOutput == null)
 				fileOutput = Path.ChangeExtension(fileInput,".gwc");
 
