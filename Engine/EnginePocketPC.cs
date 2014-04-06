@@ -36,6 +36,9 @@ end
 -- Insert workaround code before cartridge run
 -- Standard newline for Garmins
 Env.NewLine = ""<BR>\n""
+-- Remove Emulator/PocketPC crash of ShowScreen
+WFCompShowScreen = Wherigo.ShowScreen
+Wherigo.ShowScreen = function (arg1,arg2) pcall(WFCompShowScreen, arg1, arg2) end
 -- Remove Emulator/PocketPC crash with input returning nil
 function Wherigo.ZInput.GetInput(self, input)
   local inputString = input or ""<cancelled>""

@@ -25,25 +25,89 @@ using System.Collections.Generic;
 
 namespace WF.Compiler
 {
-	public enum DeviceType { Unknown, Garmin, Colorado, Oregon, PocketPC, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iPhone, iPad, iPhoneRetina, iPadRetina, Emulator, WFPlayer };
+	using DeviceType = Groundspeak.Wherigo.ZonesLinker.DeviceType;
 
 	public static class Compiler
     {
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
-			var device = DeviceType.PocketPC; //.Garmin;
+			var device = DeviceType.Unknown;
 
-			var fileInput = @"S:\Entwicklung\CSharp\WF.Compiler\WherigoTestsuite.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
+			Console.WriteLine("WF.Compiler, Version 1.0.0");
+			Console.WriteLine("Copyright 2014 by Wherigo Foundation");
+			Console.WriteLine();
 
-			if (args.Length == 1)
-				fileInput = args[0];
-
-			var fileOutput = Path.ChangeExtension(fileInput,".gwc");
+			string fileInput = null; //@"S:\Entwicklung\CSharp\WF.Compiler\WherigoTestsuite.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
+			string fileOutput = null;
 
 			int userId = 0;
-			string userName = "Test";
-			string completitionCode = "abcdefghijk";
+			string userName = "WF.Compiler";
+			string completitionCode = "123456789ABCDEF";
+
+			int i = 0;
+
+			while (i < args.Length) {
+				switch(args[i].ToLower()) {
+				case "-d":
+				case "-device":
+					if (i+1 >= args.Length) {
+						Usage();
+						return;
+					}
+					string deviceName = args[i+1].ToLower();
+					i++;
+					foreach (DeviceType d in Enum.GetValues(typeof(DeviceType))) 
+						if (d.ToString().ToLower() == deviceName) 
+							device = d;
+					break;
+				case "-o":
+				case "-output":
+					if (i+1 >= args.Length) {
+						Usage();
+						return;
+					}
+					fileOutput = args[i+1].ToLower();
+					i++;
+					break;
+				case "-u":
+				case "-username":
+					if (i+1 >= args.Length) {
+						Usage();
+						return;
+					}
+					userName = args[i+1];
+					i++;
+					break;
+				case "-c":
+				case "-code":
+					if (i+1 >= args.Length) {
+						Usage();
+						return;
+					}
+					completitionCode = args[i+1];
+					i++;
+					break;
+				default:
+					fileInput = args[i];
+					break;
+				}
+				i++;
+			}
+
+			if (fileInput == null) {
+				Usage();
+				return;
+			}
+
+			if (fileOutput == null)
+				fileOutput = Path.ChangeExtension(fileInput,".gwc");
+
+			Console.WriteLine("Input file: " + fileInput);
+			Console.WriteLine("Output file: " + fileOutput);
+			Console.WriteLine("Device: " + device.ToString());
+			Console.WriteLine("Username: " + userName);
+			Console.WriteLine("CompletionCode: " + completitionCode);
 
 			FileStream ifs = new FileStream(fileInput, FileMode.Open);
 
@@ -125,8 +189,26 @@ namespace WF.Compiler
 				return;
 			}
 
-			Console.WriteLine("Time: {0}", DateTime.Now - start);
+			Console.WriteLine("Compiletime: {0}", DateTime.Now - start);
         }
+
+		static void Usage ()
+		{
+			Console.WriteLine("Usage: WF.Compiler [options] <filename>");
+			Console.WriteLine();
+			Console.WriteLine("Options:");
+			Console.WriteLine("-d|-device");
+			string devices = "";
+			foreach (DeviceType d in Enum.GetValues(typeof(DeviceType))) 
+				devices = (devices != "" ? devices + ", " : devices) + d.ToString();
+			Console.WriteLine("One of the following devices: " + devices);
+			Console.WriteLine("-o|-output");
+			Console.WriteLine("Filename for output file. If there is none, than the input file extensions is changed to gwc.");
+			Console.WriteLine("-u|-username");
+			Console.WriteLine("Username for the cartridge");
+			Console.WriteLine("-c|-code");
+			Console.WriteLine("Completition code for the cartridge");
+		}
 
 		/// <summary>
 		/// Checke the file with name fileInput, if it is a valid GWZ file and the Lua code has no errors.
@@ -166,9 +248,7 @@ namespace WF.Compiler
 		public static MemoryStream Download(Stream ifs, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
 		{
 			// ---------- Check device ----------
-
-			// Colorado and Oregon are both the same and called here Garmin
-			if (device == DeviceType.Colorado || device == DeviceType.Oregon)
+			if (device == DeviceType.Colorado)
 				device = DeviceType.Garmin;
 
 			// ---------- Create GWZ file only (required for upload and download of GWZ file) ----------
@@ -223,7 +303,7 @@ namespace WF.Compiler
 
 		}
 
-		static IEngine CreateEngine (DeviceType device)
+		public static IEngine CreateEngine (DeviceType device)
 		{
 			IEngine result;
 
@@ -249,7 +329,7 @@ namespace WF.Compiler
 				result = new EngineXMarksTheSpot ();
 				break;
 			case DeviceType.Emulator:
-			case DeviceType.PocketPC:
+			case DeviceType.PPC2003:
 			default:
 				result = new EnginePocketPC ();
 				break;

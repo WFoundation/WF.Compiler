@@ -79,7 +79,7 @@ namespace WF.Compiler
 				}
 			}
 
-			// Now all is thecked without any problems
+			// Now all is checked without any problems
 			// So it seams, that this GWZ file is valid
 		}
 

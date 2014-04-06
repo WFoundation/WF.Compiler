@@ -27,6 +27,8 @@ using System.Text.RegularExpressions;
 
 namespace WF.Compiler
 {
+	using DeviceType = Groundspeak.Wherigo.ZonesLinker.DeviceType;
+
 	public class EngineiOS : IEngine
 	{
 		string _mediaSelector;
