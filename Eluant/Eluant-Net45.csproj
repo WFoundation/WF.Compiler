@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D4CFD952-4EDC-421D-84A5-998688815124}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Eluant</RootNamespace>
+    <AssemblyName>Eluant</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;USE_KOPILUA</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugKopiLua|AnyCPU'">
+    <OutputPath>bin\DebugKopiLua\</OutputPath>
+    <DefineConstants>USE_KOPILUA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugKopiLua|x86'">
+    <OutputPath>bin\x86\DebugKopiLua\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugKopiLua|x64'">
+    <OutputPath>bin\x64\DebugKopiLua\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="KopiLuaWrapper.cs" />
+    <Compile Include="LuaNative.cs" />
+    <Compile Include="LuaRuntime.cs" />
+    <Compile Include="LuaString.cs" />
+    <Compile Include="LuaNumber.cs" />
+    <Compile Include="LuaBoolean.cs" />
+    <Compile Include="LuaNil.cs" />
+    <Compile Include="LuaTable.cs" />
+    <Compile Include="LuaFunction.cs" />
+    <Compile Include="LuaValueExtensions.cs" />
+    <Compile Include="LuaVararg.cs" />
+    <Compile Include="LuaException.cs" />
+    <Compile Include="LuaLightUserdata.cs" />
+    <Compile Include="LuaOpaqueClrObjectReference.cs" />
+    <Compile Include="LuaOpaqueClrObject.cs" />
+    <Compile Include="LuaUserdata.cs" />
+    <Compile Include="Scripts.cs" />
+    <Compile Include="LuaReference.cs" />
+    <Compile Include="LuaValueType.cs" />
+    <Compile Include="LuaValue.cs" />
+    <Compile Include="LuaWeakReference.cs" />
+    <Compile Include="MemoryConstrainedLuaRuntime.cs" />
+    <Compile Include="LuaNumberOperators.cs">
+      <DependentUpon>LuaNumberOperators.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="LuaThread.cs" />
+    <Compile Include="LuaGlobalsTable.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <EmbeddedResource Include="BindingSupport.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LuaNumberOperators.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LuaNumberOperators.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\NLua\NLua\Core\KopiLua\KopiLua\KopiLua.Net45.csproj">
+      <Project>{e8ddbc21-ef74-4aba-9c49-bfc702be25d8}</Project>
+      <Name>KopiLua.Net45</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E0C12CBA-CA0D-46D0-8106-D17247C7EA0B}</ProjectGuid>
+    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Eluant.iOS</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>Eluant.iOS</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;MONOTOUCH</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="ObjectBinding\" />
+    <Folder Include="iOS\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="LuaBoolean.cs" />
+    <Compile Include="LuaException.cs" />
+    <Compile Include="LuaFunction.cs" />
+    <Compile Include="LuaGlobalsTable.cs" />
+    <Compile Include="LuaLightUserdata.cs" />
+    <Compile Include="LuaNative.cs" />
+    <Compile Include="LuaNil.cs" />
+    <Compile Include="LuaNumber.cs" />
+    <Compile Include="LuaNumberOperators.cs" />
+    <Compile Include="LuaOpaqueClrObject.cs" />
+    <Compile Include="LuaReference.cs" />
+    <Compile Include="LuaRuntime.cs" />
+    <Compile Include="LuaString.cs" />
+    <Compile Include="LuaTable.cs" />
+    <Compile Include="LuaThread.cs" />
+    <Compile Include="LuaUserdata.cs" />
+    <Compile Include="LuaValue.cs" />
+    <Compile Include="LuaValueExtensions.cs" />
+    <Compile Include="LuaValueType.cs" />
+    <Compile Include="LuaVararg.cs" />
+    <Compile Include="LuaWeakReference.cs" />
+    <Compile Include="MemoryConstrainedLuaRuntime.cs" />
+    <Compile Include="Scripts.cs" />
+    <Compile Include="ObjectBinding\BasicBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\BasicLuaBinder.cs" />
+    <Compile Include="ObjectBinding\Bindings.cs" />
+    <Compile Include="ObjectBinding\CombinedBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\IBindingContext.cs" />
+    <Compile Include="ObjectBinding\IBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\ILuaBinder.cs" />
+    <Compile Include="ObjectBinding\LuaMemberAttribute.cs" />
+    <Compile Include="ObjectBinding\MemberSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\MetamethodAttribute.cs" />
+    <Compile Include="LuaClrObjectReference.cs" />
+    <Compile Include="LuaClrObjectValue.cs" />
+    <Compile Include="IClrObject.cs" />
+    <Compile Include="LuaTransparentClrObject.cs" />
+    <Compile Include="LuaCustomClrObject.cs" />
+    <Compile Include="iOS\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LuaNumberOperators.tt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BindingSupport.lua">
+      <LogicalName>Eluant.BindingSupport.lua</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="iOS\liblua5.1.a">
+      <LogicalName>liblua5.1.a</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
