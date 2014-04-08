@@ -3,10 +3,8 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{87F5A1DE-F8F7-4BAE-B643-65C58449574F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>WF.Compiler</RootNamespace>
     <AssemblyName>WF.Compiler</AssemblyName>
     <TargetFrameworkProfile />
@@ -21,7 +19,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>False</ConsolePause>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -31,9 +28,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>False</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -99,8 +93,9 @@
     <Compile Include="Engine\EngineXMarksTheSpot.cs" />
     <Compile Include="Engine\EngineiOS.cs" />
     <Compile Include="Engine\EngineWFPlayer.cs" />
-    <Compile Include="ZonesLinker.cs" />
     <Compile Include="Formats\Folder.cs" />
+    <Compile Include="CompilerUrwigo.cs" />
+    <Compile Include="CompilerWherigoBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Wherigo.luac" />

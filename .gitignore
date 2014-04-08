@@ -5,6 +5,9 @@
 *.gwz
 *.gwc
 *.lua
+*.gwl
+*.wfz
+*.wfc
 
 
 #################
@@ -51,6 +54,7 @@ local.properties
 # User-specific files
 *.suo
 *.user
+*.userprefs
 *.sln.docstates
 
 # Build results
