@@ -196,7 +196,6 @@ namespace WF.Compiler
 			}
 
 			Console.WriteLine("Compiletime: {0}", DateTime.Now - start);
-            Console.ReadLine();
         }
 
 		static void Usage ()

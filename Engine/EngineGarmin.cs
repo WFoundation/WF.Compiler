@@ -30,6 +30,8 @@ namespace WF.Compiler
 	public class EngineGarmin : IEngine
 	{
 		readonly Encoding _encodingWin1252 = Encoding.GetEncoding(1252);
+		readonly ImageCodecInfo _jpegCodec;
+		readonly EncoderParameters _encParams = new EncoderParameters(2);
 
 		// Put all in the beginning in one line, so that crash report lines are correct
 		// Remove of Garmin crash with cancelled inputs is not possible
@@ -80,6 +82,15 @@ return cartridge";
 
 		public EngineGarmin ()
 		{
+			_jpegCodec = GetEncoderInfo("image/jpeg");
+
+			// Is there a jpeg encoder?
+			// Jpeg image codec
+			if (_jpegCodec == null)
+				throw new InvalidOperationException("No JPEG encoder found");
+
+			_encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.ColorDepth, 24L);
+			_encParams.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
 		}
 
 		/// <summary>
@@ -166,22 +177,15 @@ return cartridge";
 		{
 			MediaResource res = null;
 
-			// Is there a jpeg encoder?
-			// Jpeg image codec
-			ImageCodecInfo jpegCodec = GetEncoderInfo("image/jpeg");
-
-			if (jpegCodec == null)
-				throw new InvalidOperationException("No JPEG encoder found");
-
 			// Are there any resources
 			if (media.Resources.Count < 1)
 				return null;
 
 			// Get the last good media resource that could be found
 			foreach(MediaResource mr in media.Resources) {
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() && media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
 					res = mr;
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Type == MediaType.FDL || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() && media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Type == MediaType.FDL || mr.Directives.Contains("garmin") || mr.Filename.ToLower().Contains("garmin")))
 					res = mr;
 			}
 
@@ -194,21 +198,19 @@ return cartridge";
 			result.Filename = res.Filename;
 			result.Directives = res.Directives;
 
-			EncoderParameters encParams = new EncoderParameters(2);
-			encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.ColorDepth, 24L);
-			encParams.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
-
 			if (res.Type.IsImage()) {
 				// Image
+				Image imgLoader;
 				Image img;
 				using(MemoryStream ims = new MemoryStream(res.Data)) {
-					img = Image.FromStream(ims);
+					imgLoader = Image.FromStream(ims);
+					img = new Bitmap(imgLoader);
 					// Do special things with the image (resize, bit depth, ...)
 					if (!res.Directives.Contains("noresize") && img.Width > 230)
 						img = ResizeImage(img, 230);
 					// Garmin can only handle jpg
 					using(MemoryStream oms = new MemoryStream()) {
-						img.Save(oms, jpegCodec, encParams);
+						img.Save(oms, _jpegCodec, _encParams);
 						result.Data = oms.ToArray();
 					}
 				}

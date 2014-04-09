@@ -165,9 +165,9 @@ return cartridge";
 
 			// Get the last good media resource that could be found
 			foreach(MediaResource mr in media.Resources) {
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() == media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("pocketpc") || mr.Filename.ToLower().Contains("pocketpc")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsImage() && media.Resources[0].Type.IsImage() && (mr == media.Resources[0] || mr.Directives.Contains("pocketpc") || mr.Filename.ToLower().Contains("pocketpc")))
 					res = mr;
-				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() == media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Directives.Contains("pocketpc") || mr.Filename.ToLower().Contains("pocketpc")))
+				if (_mediaFormats.Contains(mr.Type) && mr.Type.IsSound() && media.Resources[0].Type.IsSound() && (mr == media.Resources[0] || mr.Directives.Contains("pocketpc") || mr.Filename.ToLower().Contains("pocketpc")))
 					res = mr;
 			}
 
