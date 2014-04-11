@@ -193,6 +193,8 @@ return cartridge";
 		string ReplaceShortStrings (string luaCode)
 		{
 			StringBuilder result = new StringBuilder();
+			string doubleQuote = @"/->double-quote<-/";
+			string singleQuote = @"/->single-quote<-/";
 			string[] lines = Regex.Split(luaCode, "\r\n|\n|\r");
 			Regex regex = new Regex(@"(""|')([^\1]*?)\1", RegexOptions.Multiline & RegexOptions.Compiled);
 
@@ -201,7 +203,7 @@ return cartridge";
 				int startAt = 0;
 				// There could be \" or \' in the string, which stops the regex. 
 				// So we replace \" with "" and \' with ''. Later we reverse this.
-				string searchLine = line.Replace(@"\""",@"/""").Replace(@"\'", @"/'");
+				string searchLine = line.Replace(@"\""", doubleQuote).Replace(@"\'", singleQuote);
 				StringBuilder replaceLine = new StringBuilder(line.Length);
 				Match match = regex.Match(searchLine);
 
@@ -224,7 +226,7 @@ return cartridge";
 				// Append a newline at the end
 				replaceLine.Append(Environment.NewLine);
 				// Reverse any changes to \" and \'
-				replaceLine.Replace(@"/""", @"\""").Replace(@"/'", @"\'");
+				replaceLine.Replace(doubleQuote, @"\""").Replace(singleQuote, @"\'");
 				// Add new line to result
 				result.Append(replaceLine);
 			}
