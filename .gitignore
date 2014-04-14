@@ -4,8 +4,9 @@
 
 *.gwz
 *.gwc
-*.lua
+*.gws
 *.gwl
+*.lua
 *.wfz
 *.wfc
 
