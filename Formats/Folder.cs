@@ -41,7 +41,7 @@ namespace WF.Compiler
 
 			// Any compilation errors of the Lua file
 			_stream.Position = 0;
-			LUA.Check(_stream);
+			LUA.Check(_stream, _luaFileName);
 
 			// Extract cartridge data from Lua file
 			_stream.Position = 0;

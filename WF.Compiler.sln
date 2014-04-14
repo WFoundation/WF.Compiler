@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WF.Compiler", "WF.Compiler.csproj", "{87F5A1DE-F8F7-4BAE-B643-65C58449574F}"
 EndProject
 Global
@@ -24,10 +24,11 @@ Global
 		{87F5A1DE-F8F7-4BAE-B643-65C58449574F}.Release|x86.ActiveCfg = Release|x86
 		{87F5A1DE-F8F7-4BAE-B643-65C58449574F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = WF.Compiler.csproj
+		version = 0.9.1
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

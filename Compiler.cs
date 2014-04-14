@@ -22,6 +22,8 @@ using System.Text.RegularExpressions;
 using Ionic.Zip;
 using Eluant;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
 
 namespace WF.Compiler
 {
@@ -34,7 +36,7 @@ namespace WF.Compiler
 			var start = DateTime.Now;
 			var device = DeviceType.Unknown;
 
-			Console.WriteLine("WF.Compiler, Version 1.0.0");
+			Console.WriteLine("WF.Compiler, Version {0}", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 			Console.WriteLine("Copyright 2014 by Wherigo Foundation");
 			Console.WriteLine();
 
@@ -130,7 +132,9 @@ namespace WF.Compiler
 			}
 			catch (CompilerLuaException e)
 			{
-				Console.WriteLine("Error at line {0}: {1}", e.Line, e.Message);
+				Console.WriteLine();
+				Console.WriteLine("Error");
+				Console.WriteLine(e.Message);
 				Console.WriteLine();
 				Console.WriteLine("Line {0}: {1}", e.Line-1, e.CodeBefore);
 				Console.WriteLine("Line {0}: {1}", e.Line, e.Code);
@@ -139,6 +143,8 @@ namespace WF.Compiler
 			}
 			catch (Exception e)
 			{
+				Console.WriteLine();
+				Console.WriteLine("Error");
 				Console.WriteLine(e.Message);
 				ifs.Close();
 				return;
@@ -164,8 +170,8 @@ namespace WF.Compiler
 			// ---------- Compile Lua code into binary chunk ----------
 
 			try {
-			// Compile Lua code
-			cartridge.Chunk = LUA.Compile(cartridge.LuaCode, cartridge.LuaFileName);
+				// Compile Lua code
+				cartridge.Chunk = LUA.Compile(cartridge.LuaCode, cartridge.LuaFileName);
 			}
 			catch (Exception e)
 			{
@@ -191,6 +197,8 @@ namespace WF.Compiler
 			}
 			catch (Exception e)
 			{
+				Console.WriteLine();
+				Console.WriteLine("Error");
 				Console.WriteLine(e.Message);
 				return;
 			}

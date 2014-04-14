@@ -30,18 +30,18 @@ namespace WF.Compiler
 		/// Check the specified luaCode in stream to see, if there are any errors.
 		/// </summary>
 		/// <param name="luaCode">Stream with Lua code to check.</param>
-		public static void Check(Stream stream)
+		public static void Check(Stream stream, string luaFileName)
 		{
 			// Get Lua code
 			string luaCode = new StreamReader(stream).ReadToEnd();
 
-			Check(luaCode);
+			Check(luaCode, luaFileName);
 		}
 		/// <summary>
 		/// Check the specified luaCode to see, if there are any errors.
 		/// </summary>
 		/// <param name="luaCode">String with Lua code to check.</param>
-		public static void Check(string luaCode)
+		public static void Check(string luaCode, string luaFileName)
 		{
 			// Create Lua runtime
 			LuaRuntime luaState = new LuaRuntime ();
@@ -49,7 +49,7 @@ namespace WF.Compiler
 			// Check Lua for errors
 			try {
 				// Try to compile the code
-				luaState.CompileString (luaCode);
+				luaState.CompileString (luaCode, luaFileName);
 			}
 			catch (Exception ex)
 			{
@@ -57,13 +57,14 @@ namespace WF.Compiler
 				// So raise an error with the error data
 				Match match = Regex.Match(ex.Message, @"(.*):(\d*):(.*)");
 				int line = Convert.ToInt32(match.Groups[2].Value);
-				string message = match.Groups[3].Value;
+				string message = String.Format("{0}, line {1}: {2}", match.Groups[1].Value.Replace("string", "File"), match.Groups[2].Value, match.Groups[3].Value);
+				string error = match.Groups[3].Value;
 				string[] lines = luaCode.Replace("\r","").Split('\n');
 				string code = lines.Length >= line-1 ? lines[line-1] : null;
 				string before = lines.Length >= line-2 ? lines[line-2] : null;
 				string after = lines.Length >= line ? lines[line] : null;
 
-				throw new CompilerLuaException(line, message, code, before, after);
+				throw new CompilerLuaException(message, line, error, code, before, after);
 			}
 
 			luaState = null;
@@ -343,17 +344,17 @@ namespace WF.Compiler
 	public class CompilerLuaException : Exception
 	{
 		int _line;
-		string _message;
+		string _error;
 		string _code;
 		string _codeBefore;
 		string _codeAfter;
 
 		#region Constructor
 
-		public CompilerLuaException(int line, string message, string code, string before, string after)
+		public CompilerLuaException(string message, int line, string error, string code, string before, string after) : base(message)
 		{
 			_line = line;
-			_message = message;
+			_error = error;
 			_code = code;
 			_codeBefore = before;
 			_codeAfter = after;
@@ -368,9 +369,9 @@ namespace WF.Compiler
 			get { return _line; }
 		}
 
-		public override string Message
+		public string Error
 		{
-			get { return _message; }
+			get { return _error; }
 		}
 
 		public string Code

@@ -62,7 +62,7 @@ namespace WF.Compiler
 				throw new FileNotFoundException("No valid Lua file found");
 
 			// Any compilation errors of the Lua file
-			LUA.Check(_zip[_luaFile.FileName].OpenReader());
+			LUA.Check(_zip[_luaFile.FileName].OpenReader(), _luaFile.FileName);
 
 			// Extract cartridge data from Lua file
 			cartridge = LUA.Extract(_zip[_luaFile.FileName].OpenReader());
