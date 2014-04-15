@@ -114,7 +114,6 @@ namespace WF.Compiler
 
 			result.LuaCode = luaCode;
 
-			// TODO
 			// Extract variable for cartridge
 			var regex = new Regex(@"return\s*([_0-9a-zA-Z]*)\s*$", RegexOptions.Singleline & RegexOptions.IgnoreCase);
 			var match = regex.Match(luaCode);

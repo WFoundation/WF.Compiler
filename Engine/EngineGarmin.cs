@@ -383,6 +383,13 @@ return cartridge";
 		/// <summary>
 		/// Replaces escape sequences with UTF-8 (like \195) with Win-1252 codes.
 		/// </summary>
+		/// <remarks>
+		/// We replace here normal UTF-8 encoded special characters by converting the string from 
+		/// Unicode to UTF-8 and than from UTF-8 to Win-1252.
+		/// Characters, that are encoded by escape sequences like \195\164 are converted from escape
+		/// sequences to normal byte format.
+		/// In this function, we assume, that the characters beyond ASCII 127 are not obfuscated.
+		/// </remarks>
 		/// <returns>New Lua code.</returns>
 		/// <param name="luaCode">Lua code.</param>
 		string ReplaceSpecialCharacters (string luaCode)
@@ -420,7 +427,7 @@ return cartridge";
 			// Resize array, because it could get shorter than before
 			Array.Resize(ref output, posOutput);
 
-			// Convert UTF-8 byte array to C# Unicode string
+			// Convert UTF-8 byte array to C# string encoded in Win-1252
 			return _encodingWin1252.GetString(Encoding.Convert(Encoding.UTF8, _encodingWin1252, output));
 		}
 
