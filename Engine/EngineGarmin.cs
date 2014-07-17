@@ -119,7 +119,7 @@ return cartridge";
 			string luaCode = cartridge.LuaCode;
 
 			// Now make special operations with the source code for different builders
-			if (IsUrwigo(cartridge.LuaCode)) {
+			if (Builders.IsUrwigo(cartridge.LuaCode)) {
 				luaCode = ReplaceSpecialCharacters(luaCode);
 			}
 
@@ -444,26 +444,6 @@ return cartridge";
 			} else {
 				return match.Groups[1].Value;
 			}
-		}
-
-		/// <summary>
-		/// Determines whether this Lua code is from Urwigo.
-		/// </summary>
-		/// <returns><c>true</c> if this Lua code is from Urwigo; otherwise, <c>false</c>.</returns>
-		/// <param name="lua">Lua code.</param>
-		public static bool IsUrwigo(string lua)
-		{
-			return lua.Contains ("Urwigo") && lua.Contains ("dtable");
-		}
-
-		/// <summary>
-		/// Determines whether this Lua code is from Earwigo.
-		/// </summary>
-		/// <returns><c>true</c> if this Lua code is from Earwigo; otherwise, <c>false</c>.</returns>
-		/// <param name="lua">Lua code.</param>
-		public static bool IsEarwigo(string lua)
-		{
-			return lua.Contains ("WWB_deobf");
 		}
 
 		#endregion

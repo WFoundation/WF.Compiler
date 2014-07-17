@@ -24,6 +24,9 @@ using System.Text.RegularExpressions;
 
 namespace WF.Compiler
 {
+	/// <summary>
+	/// This static libray contains all function for handling the Lua source code.
+	/// </summary>
 	public static class LUA
 	{
 		/// <summary>
@@ -112,7 +115,9 @@ namespace WF.Compiler
 			// Get all relevant data for cartridge
 			Cartridge result = new Cartridge();
 
-			result.LuaCode = luaCode;
+			// Now we check the Lua code for old newlines like <BR>\n or long strings with only a \n as content
+			// All this should replaced by normal \n newlines
+			result.LuaCode = ConvertToPlain(luaCode);
 
 			// Extract variable for cartridge
 			var regex = new Regex(@"return\s*([_0-9a-zA-Z]*)\s*$", RegexOptions.Singleline & RegexOptions.IgnoreCase);
@@ -219,7 +224,7 @@ namespace WF.Compiler
 			// Compile Lua code
 			LuaFunction lf = luaState.CompileString(luaCode, fileName);
 
-			// Retrive Lua code
+			// Retrive Lua code by string.dump
 			var ret = stringDump.Call(new List<LuaValue>() {lf});
 
 			if (ret.Count >= 1) {
@@ -234,6 +239,70 @@ namespace WF.Compiler
 		}
 
 		#region Private Functions
+
+		/// <summary>
+		/// Converts the original Lua code to a plain version.
+		/// </summary>
+		/// <remarks>
+		/// Replace all 
+		/// - <BR>\n with \n 
+		/// - <BR> with \n
+		/// - long strings with only a \n with short strings containing \n
+		/// This works although for Urwigo and Earwigo encoded strings. 
+		/// They are decoded, changed and encoded again.
+		/// </remarks>
+		/// <returns>The to plain.</returns>
+		/// <param name="luaCode">Lua code.</param>
+		static string ConvertToPlain (string luaCode)
+		{
+			string result = luaCode;
+
+			// Replace all the <BR> constructions
+			//			result = Regex.Replace(result, "\r\n|\n\r", "\n");
+			result = result.Replace(@"<BR>\n", @"\n");
+			result = result.Replace(@"\0+60BR\0+62\n", @"\n");
+			result = result.Replace(@"\0+60BR\0+62\010", @"\n");
+			result = result.Replace(@"\0+60BR\0+62", @"\n");
+
+			// Replace long strings containing only a newline with a short string with a newline
+			result = Regex.Replace(result, @"\[(=*)\[\n\]\1\]", "\"\\n\"");
+			result = Regex.Replace(result, @"\[(=*)\[(\r\n|\n\r)\]\1\]", "\"\\n\"");
+
+			if (Builders.IsUrwigo(result)) {
+				// Ok, it is a Lua file created by Urwigo.
+				// Here we don't check, if the string is encoded or not. We assume, that this escape 
+				// sequences only in the code where strings are obfuscated.
+				// Get the dtable of the obfuscatition function
+				List<int> dtable = Builders.GetUrwigoObfuscationTable(result);
+				// Get the escape sequences for <, >, BR and \n
+				// This only works, if the obfuscated string is coded by escape sequences with three valid digits.
+				string lt = String.Format("\\{0:000}", dtable.IndexOf('<'));
+				string gt = String.Format("\\{0:000}", dtable.IndexOf('>'));
+				string cr = String.Format("\\{0:000}", dtable.IndexOf('\r'));
+				string nl = String.Format("\\{0:000}", dtable.IndexOf('\n'));
+				string br = String.Format("\\{0:000}\\{1:000}", dtable.IndexOf('B'), dtable.IndexOf('R'));
+				// Replace all the different occurences of <BR>
+				result = Regex.Replace(result, cr+nl+"|"+nl+cr, nl);
+				result = result.Replace(lt+br+gt+nl, nl);
+			}
+
+			if (Builders.IsEarwigo(result)) {
+				// Ok, it is a Lua file created by Earwigo
+				// Search for all obfuscated strings
+				result = Regex.Replace(result, @"WWB_deobf\((""|')(.*?)\1\)", delegate (Match match) {
+//					string encoded = match.Groups[2].Value;
+//					string decoded = Builders.GetEarwigoDecodedString(encoded);
+//					decoded = decoded.Replace(@"<BR>\n", @"\n");
+//					decoded = decoded.Replace(@"\0+60BR\0+62\n", @"\n");
+//					decoded = decoded.Replace(@"\0+60BR\0+62\010", @"\n");
+//					decoded = decoded.Replace(@"\0+60BR\0+62", @"\n");
+//					encoded = Builders.GetEarwigoEncodedString(decoded);
+					return String.Format(@"WWB_deobf({0}{1}{0})", match.Groups[1].Value, match.Groups[2].Value.Replace(@"\060\001\002\062\010\003\003\003\003", @"\010"));
+					}, RegexOptions.Singleline);
+			}
+
+			return result;
+		}
 
 		/// <summary>
 		/// Extracts the media from the Lua code.

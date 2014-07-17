@@ -31,6 +31,10 @@ namespace WF.Compiler
 
 	public static class Compiler
     {
+		/// <summary>
+		/// The entry point of the program, where the program control starts and ends when used from command line.
+		/// </summary>
+		/// <param name="args">The command line arguments.</param>
         public static void Main(string[] args)
         {
 			var start = DateTime.Now;
@@ -40,7 +44,7 @@ namespace WF.Compiler
 			Console.WriteLine("Copyright 2014 by Wherigo Foundation");
 			Console.WriteLine();
 
-			string fileInput = null; //@"S:\Entwicklung\CSharp\WF.Compiler\WherigoTestsuite.gwz"; // Geocaching\Wherigo\Bebenhausen\Bebenhausen.gwz";
+			string fileInput = null; 
 			string fileOutput = null;
 
 			int userId = 0;
@@ -206,6 +210,9 @@ namespace WF.Compiler
 			Console.WriteLine("Compiletime: {0}", DateTime.Now - start);
         }
 
+		/// <summary>
+		/// Usage of programm when called from command line.
+		/// </summary>
 		static void Usage ()
 		{
 			Console.WriteLine("Usage: WF.Compiler [options] <filename>");
@@ -254,11 +261,25 @@ namespace WF.Compiler
 			ifs.Close();
 		}
 
+		/// <summary>
+		/// Compiler entry for online compilation.
+		/// </summary>
+		/// <param name="fileInput">File name of the input file.</param>
+		/// <param name="device">Device.</param>
+		/// <param name="userName">User name.</param>
+		/// <param name="completitionCode">Completition code.</param>
 		public static MemoryStream Download(string fileInput, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
 		{
 			return Download(new FileStream(fileInput, FileMode.Open), device, userName, completitionCode);
 		}
 
+		/// <summary>
+		/// Compiler entry for online compilation.
+		/// </summary>
+		/// <param name="ifs">Stream of the input file.</param>
+		/// <param name="device">Device.</param>
+		/// <param name="userName">User name.</param>
+		/// <param name="completitionCode">Completition code.</param>
 		public static MemoryStream Download(Stream ifs, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
 		{
 			// ---------- Check device ----------

@@ -9,6 +9,11 @@
 *.lua
 *.wfz
 *.wfc
+*.jpg
+*.bmp
+*.png
+*.mp3
+*.fdl
 
 
 #################

@@ -75,7 +75,7 @@ namespace WF.Compiler
 				foreach(MediaResource resource in media.Resources) {
 					// Check, if filename is in list of files
 					if (!_zip.EntryFileNames.Contains(resource.Filename))
-						throw new FileNotFoundException("Gwz don't contain file", resource.Filename);
+						throw new FileNotFoundException(String.Format("The GWZ is missing a file referred to by the cartridge's code. The file name is: {0}", resource.Filename));
 				}
 			}
 
