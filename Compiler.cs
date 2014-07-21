@@ -283,8 +283,6 @@ namespace WF.Compiler
 		public static MemoryStream Download(Stream ifs, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
 		{
 			// ---------- Check device ----------
-			if (device == DeviceType.Colorado)
-				device = DeviceType.Garmin;
 
 			// ---------- Create GWZ file only (required for upload and download of GWZ file) ----------
 
@@ -347,9 +345,6 @@ namespace WF.Compiler
 				result = new EngineGarmin ();
 				break;
 			case DeviceType.iPhone:
-			case DeviceType.iPad:
-			case DeviceType.iPhoneRetina:
-			case DeviceType.iPadRetina:
 				result = new EngineiOS (device);
 				break;
 			case DeviceType.WFPlayer:
@@ -357,7 +352,6 @@ namespace WF.Compiler
 				break;
 			case DeviceType.OpenWIG:
 			case DeviceType.WhereYouGo:
-			case DeviceType.DesktopWIG:
 				result = new EngineOpenWIG ();
 				break;
 			case DeviceType.XMarksTheSpot:

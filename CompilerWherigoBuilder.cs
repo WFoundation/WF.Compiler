@@ -22,7 +22,7 @@ using WF.Compiler;
 
 namespace Groundspeak.Wherigo.ZonesLinker
 {
-	public enum DeviceType { Unknown = 0, PPC2003, Garmin, Colorado, WhereYouGo, DesktopWIG, OpenWIG, XMarksTheSpot, iPhone, iPad, iPhoneRetina, iPadRetina, Emulator, WFPlayer };
+	public enum DeviceType { Unknown = 0, PPC2003, Garmin, WhereYouGo, OpenWIG, XMarksTheSpot, iPhone, iPhoneRetina, iPad, iPadRetina, Emulator, WFPlayer };
 	public enum EngineVersion { V0210 = 1, V0211 };
 
 	public class ZonesLinker
