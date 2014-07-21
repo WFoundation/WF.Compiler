@@ -236,8 +236,8 @@ return cartridge";
 		string ReplaceShortStrings (string luaCode)
 		{
 			StringBuilder result = new StringBuilder();
-			string doubleQuote = @"/->double-quote<-/";
-			string singleQuote = @"/->single-quote<-/";
+			string doubleQuote = @"/-double-quote-/";
+			string singleQuote = @"/-single-quote-/";
 			string[] lines = Regex.Split(luaCode, "\r\n|\n|\r");
 			Regex regex = new Regex(@"(""|')([^\1]*?)\1", RegexOptions.Multiline & RegexOptions.Compiled);
 
