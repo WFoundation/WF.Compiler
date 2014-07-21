@@ -8,7 +8,7 @@
     <RootNamespace>WF.Compiler</RootNamespace>
     <AssemblyName>WF.Compiler</AssemblyName>
     <TargetFrameworkProfile />
-    <ReleaseVersion>0.9.2</ReleaseVersion>
+    <ReleaseVersion>0.9.3</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>True</DebugSymbols>
@@ -19,7 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <Commandlineparameters>-d Garmin ..\..\TouringMaxville.gwz</Commandlineparameters>
+    <Commandlineparameters>-d Garmin ..\..\die_wherigo_testsu.gwz</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
