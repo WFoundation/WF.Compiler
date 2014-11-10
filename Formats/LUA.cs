@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using Eluant;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace WF.Compiler
 {
@@ -222,7 +223,7 @@ namespace WF.Compiler
 			LuaFunction stringDump = (LuaFunction)stringTable["dump"];
 
 			// Compile Lua code
-			LuaFunction lf = luaState.CompileString(luaCode, fileName);
+			LuaFunction lf = luaState.CompileString(Encoding.UTF8.GetBytes(luaCode), fileName);
 
 			// Retrive Lua code by string.dump
 			var ret = stringDump.Call(new List<LuaValue>() {lf});
