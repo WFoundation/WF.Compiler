@@ -25,6 +25,7 @@ namespace WF.Compiler
 {
 	public class GWZ : IInput
 	{
+		int _luaFiles = 0;
 		Stream _stream;
 		ZipFile _zip;
 		ZipEntry _luaFile = null;
@@ -53,6 +54,7 @@ namespace WF.Compiler
 				{
 					case ".lua":
 						_luaFile = zipEntry;
+						_luaFiles += 1;
 						break;
 				}
 			}
@@ -60,6 +62,10 @@ namespace WF.Compiler
 			// Is there a Lua file?
 			if (_luaFile == null)
 				throw new FileNotFoundException("No valid Lua file found");
+
+			// Is there more than one Lua file
+			if (_luaFiles > 1)
+				throw new FileLoadException("More than one Lua file found");
 
 			// Any compilation errors of the Lua file
 			LUA.Check(_zip[_luaFile.FileName].OpenReader(), _luaFile.FileName);
