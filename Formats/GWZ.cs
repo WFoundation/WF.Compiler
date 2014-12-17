@@ -81,7 +81,12 @@ namespace WF.Compiler
 				foreach(MediaResource resource in media.Resources) {
 					// Check, if filename is in list of files
 					if (!_zip.EntryFileNames.Contains(resource.Filename))
-						throw new FileNotFoundException(String.Format("The GWZ is missing a file referred to by the cartridge's code. The file name is: {0}", resource.Filename));
+					{
+						if (string.IsNullOrWhiteSpace(resource.Filename))
+							throw new FileNotFoundException("The Lua file is referencing a file without a filename");
+						else
+							throw new FileNotFoundException(String.Format("The GWZ is missing a file referred to by the cartridge's code. The file name is: {0}", resource.Filename));
+					}
 				}
 			}
 
