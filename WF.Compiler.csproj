@@ -8,7 +8,7 @@
     <RootNamespace>WF.Compiler</RootNamespace>
     <AssemblyName>WF.Compiler</AssemblyName>
     <TargetFrameworkProfile />
-    <ReleaseVersion>0.9.4</ReleaseVersion>
+    <ReleaseVersion>0.9.6</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>True</DebugSymbols>
@@ -19,7 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <Commandlineparameters>-d WhereYouGo S:\Geocaching\Wherigo\Jonny65\Wherigo_Testsuite_DE\Wherigo_Testsuite_DE.gwz</Commandlineparameters>
+    <Commandlineparameters>-d WhereYouGo S:\Geocaching\Wherigo\WGB8\WGB8.gwz</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">

@@ -277,14 +277,14 @@ namespace WF.Compiler
 				List<int> dtable = Builders.GetUrwigoObfuscationTable(result);
 				// Get the escape sequences for <, >, BR and \n
 				// This only works, if the obfuscated string is coded by escape sequences with three valid digits.
-				string lt = String.Format("\\{0:000}", dtable.IndexOf('<'));
-				string gt = String.Format("\\{0:000}", dtable.IndexOf('>'));
-				string cr = String.Format("\\{0:000}", dtable.IndexOf('\r'));
-				string nl = String.Format("\\{0:000}", dtable.IndexOf('\n'));
-				string br = String.Format("\\{0:000}\\{1:000}", dtable.IndexOf('B'), dtable.IndexOf('R'));
+				string lt = String.Format("{0:000}", dtable.IndexOf('<'));
+				string gt = String.Format("{0:000}", dtable.IndexOf('>'));
+				string cr = String.Format("{0:000}", dtable.IndexOf('\r'));
+				string nl = String.Format("{0:000}", dtable.IndexOf('\n'));
+				string br = String.Format("{0:000}\\{1:000}", dtable.IndexOf('B'), dtable.IndexOf('R'));
 				// Replace all the different occurences of <BR>
-				result = Regex.Replace(result, cr+nl+"|"+nl+cr, nl);
-				result = result.Replace(lt+br+gt+nl, nl);
+				result = Regex.Replace(result, "\\\\"+cr+"\\\\"+nl+"|"+"\\\\"+nl+"\\\\"+cr, "\\"+nl);
+				result = result.Replace("\\\\"+lt+"\\\\"+br+"\\\\"+gt+"\\\\"+nl, "\\"+nl);
 			}
 
 			if (Builders.IsEarwigo(result)) {
