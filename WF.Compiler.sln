@@ -25,7 +25,7 @@ Global
 		{87F5A1DE-F8F7-4BAE-B643-65C58449574F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		version = 0.9.6
+		version = 0.9.7
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

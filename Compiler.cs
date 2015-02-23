@@ -345,6 +345,9 @@ namespace WF.Compiler
 				result = new EngineGarmin ();
 				break;
 			case DeviceType.iPhone:
+			case DeviceType.iPhoneRetina:
+			case DeviceType.iPad:
+			case DeviceType.iPadRetina:
 				result = new EngineiOS (device);
 				break;
 			case DeviceType.WFPlayer:
