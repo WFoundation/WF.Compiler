@@ -151,8 +151,8 @@ namespace WF.Compiler
 			result.Visible = ((LuaBoolean)cart["Visible"]).ToBoolean();
 			result.Complete = ((LuaBoolean)cart["Complete"]).ToBoolean();
 			result.UseLogging = ((LuaBoolean)cart["UseLogging"]).ToBoolean();
-			ltMedia = cart["Media"] is LuaBoolean ? null : (LuaTable)cart["Media"];
-			ltIcon = cart["Icon"] is LuaBoolean ? null : (LuaTable)cart["Icon"];
+			ltMedia = (cart["Media"] is LuaBoolean || cart["Media"] is LuaNil) ? null : (LuaTable)cart["Media"];
+			ltIcon = (cart["Icon"] is LuaBoolean || cart["Icon"] is LuaNil) ? null : (LuaTable)cart["Icon"];
 
 			// Check for medias of cartridge
 			var table = (LuaTable)luaState.Globals["table"];
