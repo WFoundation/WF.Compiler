@@ -120,7 +120,7 @@ namespace WF.Compiler
 			Console.WriteLine("Username: " + userName);
 			Console.WriteLine("CompletionCode: " + completitionCode);
 
-			FileStream ifs = new FileStream(fileInput, FileMode.Open);
+			FileStream ifs = new FileStream(fileInput, FileMode.Open, FileAccess.Read, FileShare.Read);
 
 			// ---------- Create GWZ file only (required for upload and download of GWZ file) ----------
 
@@ -236,7 +236,7 @@ namespace WF.Compiler
 		/// <param name="fileInput">File name for input.</param>
 		public static void Upload(string fileInput)
 		{
-			Upload(new FileStream(fileInput, FileMode.Open));
+			Upload(new FileStream(fileInput, FileMode.Open, FileAccess.Read, FileShare.Read));
 		}
 
 		/// <summary>
@@ -269,7 +269,7 @@ namespace WF.Compiler
 		/// <param name="completitionCode">Completition code.</param>
 		public static MemoryStream Download(string fileInput, DeviceType device = DeviceType.Emulator, string userName = "WF.Compiler", string completitionCode = "1234567890ABCDE")
 		{
-			return Download(new FileStream(fileInput, FileMode.Open), device, userName, completitionCode);
+			return Download(new FileStream(fileInput, FileMode.Open, FileAccess.Read, FileShare.Read), device, userName, completitionCode);
 		}
 
 		/// <summary>
