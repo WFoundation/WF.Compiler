@@ -60,13 +60,15 @@ namespace WF.Compiler
 				// There are errors in the Lua code
 				// So raise an error with the error data
 				Match match = Regex.Match(ex.Message, @"(.*):(\d*):(.*)");
-				int line = Convert.ToInt32(match.Groups[2].Value);
+				int line;
+				if (!Int32.TryParse(match.Groups[2].Value, out line) || line < 1)
+					throw new CompilerLuaException(ex.Message, 0, ex.Message, null, null, null);
 				string message = String.Format("{0}, line {1}: {2}", match.Groups[1].Value.Replace("string", "File"), match.Groups[2].Value, match.Groups[3].Value);
 				string error = match.Groups[3].Value;
 				string[] lines = luaCode.Replace("\r","").Split('\n');
-				string code = lines.Length >= line-1 ? lines[line-1] : null;
-				string before = lines.Length >= line-2 ? lines[line-2] : null;
-				string after = lines.Length >= line ? lines[line] : null;
+				string code = line <= lines.Length ? lines[line-1] : null;
+				string before = line > 1 && line-2 < lines.Length ? lines[line-2] : null;
+				string after = line < lines.Length ? lines[line] : null;
 
 				throw new CompilerLuaException(message, line, error, code, before, after);
 			}

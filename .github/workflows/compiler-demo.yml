@@ -1,0 +1,59 @@
+name: Build approved compiler demonstration
+run-name: Compiler demo by @${{ github.actor }}
+
+# Controlled project testing only: no visitor uploads, cron, or public dispatch API.
+on:
+  workflow_dispatch:
+    inputs:
+      publish_to_website:
+        description: Publish the verified demo downloads to the configured website service
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: approved-compiler-demonstration
+  cancel-in-progress: false
+
+jobs:
+  compile:
+    # Deliberately refuse private repositories to avoid metered runner usage.
+    if: ${{ github.event.repository.private == false }}
+    runs-on: windows-2022
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out the approved source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify compiler, GWC bytecode, and Lua diagnostics
+        run: ./service/test/native-smoke.ps1
+      - name: Build the approved playable demonstration
+        run: ./service/demo/build-demo.ps1 -SkipBuild
+      - name: Retain small demo files for one day
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: wherigo-compiler-demonstration
+          path: service/demo/output/
+          if-no-files-found: error
+          retention-days: 1
+      - name: Publish approved results through the storage quota
+        if: ${{ inputs.publish_to_website }}
+        env:
+          COMPILER_SERVICE_URL: ${{ vars.COMPILER_SERVICE_URL }}
+          DEMO_PUBLISH_TOKEN: ${{ secrets.DEMO_PUBLISH_TOKEN }}
+        run: node service/demo/publish-demo.mjs
+      - name: Write demonstration summary
+        run: |
+          @"
+          ## Wherigo compiler demonstration
+          Generated genuine GWC files for Garmin, iPhone, and WhereYouGo from the approved play-anywhere sample.
+          Download the one-day artifact above, or use the website links if publication was enabled.
+          This workflow tests the compiler project; it is not an unrestricted website compilation service.
+          "@ >> $env:GITHUB_STEP_SUMMARY

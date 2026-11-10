@@ -1,0 +1,7 @@
+.git
+bin
+obj
+service/node_modules
+service/.wrangler
+service/.dev.vars
+service/.env*

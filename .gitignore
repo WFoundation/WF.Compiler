@@ -212,6 +212,16 @@ $RECYCLE.BIN/
 
 *.py[co]
 
+# Compiler website service (no credentials or local runtime data in Git)
+service/node_modules/
+service/.wrangler/
+service/.dev.vars*
+service/.env*
+service/test/output/
+!Eluant/BindingSupport.lua
+service/demo/output/
+!service/demo/cartridge.lua
+
 # Packages
 *.egg
 *.egg-info

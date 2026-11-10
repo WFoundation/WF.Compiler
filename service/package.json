@@ -1,0 +1,13 @@
+{
+  "name": "wherigo-compiler-service",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check:deploy": "wrangler deploy --dry-run --outdir .wrangler/dry-run"
+  },
+  "devDependencies": {
+    "wrangler": "4.158.0",
+    "yaml": "2.9.1"
+  }
+}

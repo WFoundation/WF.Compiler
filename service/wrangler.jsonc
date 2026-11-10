@@ -1,0 +1,19 @@
+{
+  "name": "wherigo-compiler",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-09",
+  "account_id": "9fc7410af12261185b658ea2294256d9",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGIN": "http://localhost:8765",
+    "SERVICE_ENABLED": "false"
+  },
+  "r2_buckets": [
+    { "binding": "SOURCES", "bucket_name": "wherigo-sources" },
+    { "binding": "TEMPORARY", "bucket_name": "wherigo-builds" }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "COORDINATOR", "class_name": "CompilerCoordinator" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["CompilerCoordinator"] }]
+}

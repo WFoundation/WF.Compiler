@@ -88,6 +88,23 @@ namespace WF.Compiler
 
 				luaState.DoString(binChunk, "Wherigo.lua");
 			}
+
+            // Compiler-time extraction does not need filesystem access, command
+            // execution, environment secrets, or dynamically loaded libraries.
+            // Keep ordinary time/date helpers used by cartridge initialization.
+            // This is defense in depth; untrusted jobs still require an OS sandbox.
+            luaState.DoString(@"
+                io = nil; debug = nil; dofile = nil; loadfile = nil
+                if os then
+                    os.execute = nil; os.exit = nil; os.getenv = nil
+                    os.remove = nil; os.rename = nil; os.tmpname = nil
+                    os.setlocale = nil
+                end
+                if package then
+                    package.loadlib = nil; package.path = ''; package.cpath = ''
+                    package.loaders = {}
+                end
+            ");
 		}
 
 		#endregion
