@@ -8,5 +8,7 @@ RUN powershell -NoProfile -File service/runner/build.ps1
 FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2022
 WORKDIR C:/compiler
 COPY --from=build C:/src/bin/Release/ C:/compiler/
+COPY --from=build C:/src/service/runner/install-runtime.ps1 C:/compiler/install-runtime.ps1
+RUN powershell -NoProfile -File C:/compiler/install-runtime.ps1
 USER ContainerUser
 ENTRYPOINT ["C:\\compiler\\CompilerJob.exe"]

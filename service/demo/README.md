@@ -18,6 +18,13 @@ iPhone and WhereYouGo. A one-day artifact contains the source package, GWC files
 compiler reports and SHA-256 manifest. Source and outputs are public demo material.
 Compilation is verified locally. Real-player behavior has not yet been verified.
 
+The upstream x86 Lua DLL requires Microsoft's Visual C++ 2012 runtime. The first
+GitHub run exposed its absence on the hosted image. The workflow now explicitly
+installs it from Microsoft's official download, verifying its pinned SHA-256 and
+Microsoft Authenticode signature. This setup runs on the disposable GitHub host;
+it does not install anything on the developer's PC. Checkout uses the pinned v6
+action to avoid the retired Node 20 runtime.
+
 When `publish_to_website` is checked, a separate post-compilation step sends the
 verified files to the configured Cloudflare service. The service stores them in
 the existing private `wherigo-builds` bucket, using the same 9 GB reservation

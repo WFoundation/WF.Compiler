@@ -29,9 +29,11 @@ jobs:
         shell: pwsh
     steps:
       - name: Check out the approved source
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+      - name: Set up the upstream native Lua dependency
+        run: ./service/runner/install-runtime.ps1
       - name: Verify compiler, GWC bytecode, and Lua diagnostics
         run: ./service/test/native-smoke.ps1
       - name: Build the approved playable demonstration
