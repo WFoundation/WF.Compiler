@@ -86,7 +86,7 @@ cd service
 node --test test/storage.test.js
 ```
 
-Native tests build the legacy x86 compiler against .NET Framework 4.7.2 and test
+Native tests build the x86 compiler as a self contained .NET 10 app and test
 only self-authored trusted source. They generate actual GWC files for all nine
 listed profiles and check the GWC header and embedded Lua 5.1 bytecode signature.
 They also check Lua errors on the first/last lines. This is a smoke test, not

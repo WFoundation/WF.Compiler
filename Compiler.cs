@@ -19,7 +19,6 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using Ionic.Zip;
 using Eluant;
 using System.Collections.Generic;
 using System.Reflection;

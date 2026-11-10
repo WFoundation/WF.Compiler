@@ -18,7 +18,6 @@
 
 using System;
 using System.IO;
-using Ionic.Zip;
 using System.Collections.Generic;
 
 namespace WF.Compiler

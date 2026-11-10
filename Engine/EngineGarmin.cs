@@ -29,6 +29,12 @@ namespace WF.Compiler
 {
 	public class EngineGarmin : IEngine
 	{
+		static EngineGarmin()
+		{
+			// Modern .NET only ships Win-1252 through the code pages provider
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		}
+
 		readonly Encoding _encodingWin1252 = Encoding.GetEncoding(1252);
 		readonly ImageCodecInfo _jpegCodec;
 		readonly EncoderParameters _encParams = new EncoderParameters(2);
@@ -395,7 +401,8 @@ return cartridge";
 		string ReplaceSpecialCharacters (string luaCode)
 		{
 			// Convert C# Unicode string to UTF-8, its native format
-			byte[] input = Encoding.Convert(Encoding.Default, Encoding.UTF8, Encoding.Default.GetBytes(luaCode));
+			// Encoding.Default was the Windows ANSI code page (Win-1252) on .NET Framework, but is UTF-8 on modern .NET
+			byte[] input = Encoding.Convert(_encodingWin1252, Encoding.UTF8, _encodingWin1252.GetBytes(luaCode));
 			byte[] output = new byte[input.Length];
 
 			// Now check for byte combinations like \128 to \255

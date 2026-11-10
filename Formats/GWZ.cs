@@ -18,7 +18,7 @@
 
 using System;
 using System.IO;
-using Ionic.Zip;
+using System.IO.Compression;
 using System.Collections.Generic;
 
 namespace WF.Compiler
@@ -27,9 +27,32 @@ namespace WF.Compiler
 	{
 		int _luaFiles = 0;
 		Stream _stream;
-		ZipFile _zip;
-		ZipEntry _luaFile = null;
+		ZipArchive _zip;
+		ZipArchiveEntry _luaFile = null;
 		Cartridge cartridge = null;
+
+		// DotNetZip looked up entries ignoring case and with "/" as separator.
+		// Keep that behavior so existing GWZ files resolve the same media files.
+		ZipArchiveEntry FindEntry(string name)
+		{
+			if (name == null)
+				return null;
+			string wanted = name.Replace('\\', '/');
+			foreach (ZipArchiveEntry entry in _zip.Entries)
+				if (string.Equals(entry.FullName.Replace('\\', '/'), wanted, StringComparison.OrdinalIgnoreCase))
+					return entry;
+			return null;
+		}
+
+		static Stream OpenEntry(ZipArchiveEntry entry)
+		{
+			// Read into memory so callers get a seekable stream with a Length.
+			var ms = new MemoryStream();
+			using (Stream s = entry.Open())
+				s.CopyTo(ms);
+			ms.Position = 0;
+			return ms;
+		}
 
 		public GWZ (Stream stream)
 		{
@@ -43,14 +66,25 @@ namespace WF.Compiler
 				throw new FileNotFoundException("No valid file");
 
 			// Now read gwz file and save for later use
-			_zip = ZipFile.Read(_stream);
+			try
+			{
+				_zip = new ZipArchive(_stream, ZipArchiveMode.Read, true);
+			}
+			catch (InvalidDataException)
+			{
+				_zip = null;
+			}
 
 			if (_zip == null)
 				throw new FileLoadException("No valid gwz file");
 
-			foreach(ZipEntry zipEntry in _zip.Entries)
+			foreach(ZipArchiveEntry zipEntry in _zip.Entries)
 			{
-				switch(Path.GetExtension(zipEntry.FileName).ToLower())
+				// Skip folder entries
+				if (zipEntry.FullName.EndsWith("/") || zipEntry.FullName.EndsWith("\\"))
+					continue;
+
+				switch(Path.GetExtension(zipEntry.FullName).ToLower())
 				{
 					case ".lua":
 						_luaFile = zipEntry;
@@ -68,19 +102,19 @@ namespace WF.Compiler
 				throw new FileLoadException("More than one Lua file found");
 
 			// Any compilation errors of the Lua file
-			LUA.Check(_zip[_luaFile.FileName].OpenReader(), _luaFile.FileName);
+			LUA.Check(OpenEntry(_luaFile), _luaFile.FullName);
 
 			// Extract cartridge data from Lua file
-			cartridge = LUA.Extract(_zip[_luaFile.FileName].OpenReader());
+			cartridge = LUA.Extract(OpenEntry(_luaFile));
 
 			// Save Lua file name for later use
-			cartridge.LuaFileName = _luaFile.FileName;
+			cartridge.LuaFileName = _luaFile.FullName;
 
 			// Now check, if all media resources files exist
 			foreach(Media media in cartridge.Medias) {
 				foreach(MediaResource resource in media.Resources) {
 					// Check, if filename is in list of files
-					if (!_zip.EntryFileNames.Contains(resource.Filename))
+					if (FindEntry(resource.Filename) == null)
 					{
 						if (string.IsNullOrWhiteSpace(resource.Filename))
 							throw new FileNotFoundException("The Lua file is referencing a file without a filename");
@@ -106,13 +140,13 @@ namespace WF.Compiler
 
 			if (cartridge == null)
 				// Extract cartridge data from Lua file
-				cartridge = LUA.Extract(_zip[_luaFile.FileName].OpenReader());
+				cartridge = LUA.Extract(OpenEntry(_luaFile));
 
 			// Retrive input streams for medias
 			foreach(Media media in cartridge.Medias) {
 				foreach(MediaResource r in media.Resources) {
 					// Load data of file into byte array
-					var br = new BinaryReader(_zip[r.Filename].OpenReader());
+					var br = new BinaryReader(OpenEntry(FindEntry(r.Filename)));
 					r.Data = new byte[br.BaseStream.Length];
 					r.Data = br.ReadBytes(r.Data.Length);
 					br = null;

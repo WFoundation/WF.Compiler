@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 using WF.Compiler;
 using DeviceType = Groundspeak.Wherigo.ZonesLinker.DeviceType;
 
@@ -41,7 +41,7 @@ public static class CompilerJob
             if (error.CodeAfter != null) messages.Add("Line " + (error.Line + 1) + ": " + error.CodeAfter);
         }
         catch (Exception error) { messages.Add(error.Message); }
-        File.WriteAllText(report, new JavaScriptSerializer().Serialize(new { device = device, ok = ok, messages = messages }));
+        File.WriteAllText(report, JsonSerializer.Serialize(new { device = device, ok = ok, messages = messages }));
         return ok ? 0 : 1;
     }
 
